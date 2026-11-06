@@ -1,0 +1,221 @@
+---
+import { site } from '../data/site';
+---
+
+<section class="section work" id="work">
+  <div class="wrap">
+    <header class="work__head">
+      <div>
+        <p class="eyebrow" data-reveal>Selected Work</p>
+        <h2 class="section-title" data-reveal>
+          做过的东西，<br />
+          <span class="muted">比说过的话多。</span>
+        </h2>
+      </div>
+      <p class="work__count mono" data-reveal>
+        {String(site.projects.length).padStart(2, '0')} PROJECTS — 2026
+      </p>
+    </header>
+
+    <ol class="work__list">
+      {site.projects.map((project) => {
+        const Tag = project.href ? 'a' : 'div';
+        const linkProps = project.href
+          ? { href: project.href, target: '_blank', rel: 'noopener noreferrer' }
+          : {};
+        return (
+          <li class="work__item" data-reveal>
+            <Tag class="work__row" {...linkProps}>
+              <span class="work__index mono">{project.index}</span>
+
+              <div class="work__main">
+                <div class="work__title-row">
+                  <h3>{project.title}</h3>
+                  <span class="work__sub">{project.subtitle}</span>
+                </div>
+                <p class="work__desc">{project.description}</p>
+                <ul class="work__tags">
+                  {project.tags.map((tag) => <li>{tag}</li>)}
+                </ul>
+              </div>
+
+              <div class="work__side">
+                <span class="mono">{project.year}</span>
+                {project.href && <span class="work__arrow" aria-hidden="true">↗</span>}
+              </div>
+            </Tag>
+          </li>
+        );
+      })}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .work__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: clamp(3rem, 7vh, 5rem);
+  }
+
+  .work__count {
+    color: var(--color-mute);
+    padding-bottom: 0.6rem;
+  }
+
+  .work__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .work__item {
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .work__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    gap: clamp(1rem, 3vw, 3rem);
+    padding: clamp(1.6rem, 4vw, 2.6rem) 0;
+    transition: padding 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .work__row::before {
+    content: "";
+    position: absolute;
+    inset: 0 calc(var(--gutter) * -0.5);
+    background: linear-gradient(90deg, rgba(201, 255, 61, 0.055), transparent 70%);
+    opacity: 0;
+    transform: scaleX(0.96);
+    transform-origin: left;
+    transition:
+      opacity 0.4s ease,
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  .work__row:hover {
+    padding-inline: 0.9rem;
+  }
+
+  .work__row:hover::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .work__index {
+    color: var(--color-mute);
+    font-size: 0.7rem;
+    padding-top: 0.65rem;
+  }
+
+  .work__main {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .work__title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .work__title-row h3 {
+    font-size: clamp(1.5rem, 3.4vw, 2.6rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    transition: color 0.3s ease;
+  }
+
+  .work__row:hover h3 {
+    color: var(--color-acid);
+  }
+
+  .work__sub {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--color-mute);
+    letter-spacing: 0.04em;
+  }
+
+  .work__desc {
+    max-width: 46rem;
+    color: var(--color-mute);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .work__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .work__tags li {
+    font-family: var(--font-mono);
+    font-size: 0.63rem;
+    letter-spacing: 0.02em;
+    color: var(--color-paper);
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    padding: 0.22rem 0.6rem;
+  }
+
+  .work__side {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.6rem;
+    font-size: 0.7rem;
+    color: var(--color-mute);
+    padding-top: 0.55rem;
+  }
+
+  .work__arrow {
+    display: inline-block;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .work__row:hover .work__arrow {
+    transform: translate(4px, -4px);
+    color: var(--color-acid);
+  }
+
+  @media (max-width: 760px) {
+    .work__row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.6rem;
+    }
+
+    .work__index {
+      display: none;
+    }
+
+    .work__side {
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.45rem;
+      padding-top: 0.4rem;
+    }
+
+    .work__desc {
+      font-size: 0.85rem;
+    }
+
+    .work__title-row {
+      gap: 0.4rem 0.7rem;
+    }
+  }
+</style>

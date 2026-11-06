@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/url';
+---
+
+<Base title="404 — 页面不存在" description="这个地址没有内容。">
+  <section class="notfound wrap">
+    <p class="eyebrow">Error 404</p>
+    <h1 class="notfound__title">这里什么都没有。</h1>
+    <p class="notfound__text muted">链接可能过期了，或者这个页面已经不在了。</p>
+    <a class="notfound__back mono" href={url('/')}>← 回首页</a>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    min-height: 82svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 8rem 4rem;
+  }
+
+  .notfound__title {
+    margin-top: 1.4rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 9vw, 7rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+  }
+
+  .notfound__text {
+    margin-top: 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  .notfound__back {
+    display: inline-block;
+    margin-top: 2.4rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--color-line);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .notfound__back:hover {
+    color: var(--color-acid);
+    border-color: var(--color-acid);
+  }
+</style>

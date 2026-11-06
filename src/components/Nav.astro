@@ -1,0 +1,178 @@
+---
+import { site } from '../data/site';
+import { anchor, url } from '../lib/url';
+
+const links = [
+  { label: '作品', href: anchor('#work') },
+  { label: '关于', href: anchor('#about') },
+  { label: '能力', href: anchor('#capabilities') },
+  { label: '联系', href: anchor('#contact') },
+];
+---
+
+<header class="nav" data-nav>
+  <div class="nav__inner wrap">
+    <a class="nav__brand" href={url('/')} aria-label={`${site.name} 首页`}>
+      <span class="nav__dot" aria-hidden="true"></span>
+      <span>{site.name}</span>
+      <span class="nav__en mono">{site.nameEn}</span>
+    </a>
+
+    <nav class="nav__links" aria-label="主导航">
+      {links.map((link) => <a href={link.href}>{link.label}</a>)}
+    </nav>
+
+    <a class="nav__cta mono" href={`mailto:${site.email}`}>
+      <span data-local-time>--:--</span>
+      <span class="nav__cta-label">HIRE ME</span>
+    </a>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    padding-block: 1.1rem;
+    transition:
+      background 0.35s ease,
+      border-color 0.35s ease,
+      padding 0.35s ease;
+    border-bottom: 1px solid transparent;
+  }
+
+  .nav.is-scrolled {
+    padding-block: 0.7rem;
+    background: rgba(5, 6, 7, 0.72);
+    border-bottom-color: var(--color-line);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .nav__brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .nav__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-acid);
+    box-shadow: 0 0 14px rgba(201, 255, 61, 0.7);
+    align-self: center;
+  }
+
+  .nav__en {
+    font-size: 0.62rem;
+    color: var(--color-mute);
+    letter-spacing: 0.16em;
+  }
+
+  .nav__links {
+    display: flex;
+    gap: clamp(1rem, 2.4vw, 2.2rem);
+    font-size: 0.84rem;
+    color: var(--color-mute);
+  }
+
+  .nav__links a {
+    position: relative;
+    padding-block: 0.2rem;
+    transition: color 0.2s ease;
+  }
+
+  .nav__links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--color-acid);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .nav__links a:hover {
+    color: var(--color-paper);
+  }
+
+  .nav__links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .nav__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--color-mute);
+  }
+
+  .nav__cta [data-local-time] {
+    color: var(--color-paper);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nav__cta-label {
+    padding: 0.42rem 0.7rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    transition:
+      border-color 0.25s ease,
+      color 0.25s ease,
+      background 0.25s ease;
+  }
+
+  .nav__cta:hover .nav__cta-label {
+    color: #050607;
+    background: var(--color-acid);
+    border-color: var(--color-acid);
+  }
+
+  @media (max-width: 720px) {
+    .nav__links,
+    .nav__en,
+    .nav__cta [data-local-time] {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const time = document.querySelector<HTMLElement>('[data-local-time]');
+
+  if (nav) {
+    const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  if (time) {
+    const fmt = new Intl.DateTimeFormat('zh-CN', {
+      timeZone: 'Asia/Shanghai',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const tick = () => (time.textContent = `${fmt.format(new Date())} CST`);
+    tick();
+    setInterval(tick, 30_000);
+  }
+</script>

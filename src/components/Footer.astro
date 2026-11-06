@@ -1,0 +1,85 @@
+---
+import { site } from '../data/site';
+import { anchor } from '../lib/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__top">
+      <a class="foot__name" href={anchor('#top')} aria-label="回到顶部">{site.name}</a>
+      <div class="foot__links">
+        {site.socials.map((s) => <a href={s.href} rel="noopener noreferrer">{s.label}</a>)}
+      </div>
+    </div>
+
+    <div class="foot__bottom mono">
+      <span>© {year} {site.name} · {site.nameEn}</span>
+      <span class="foot__built">Astro · R3F · GSAP — 零跟踪，无 Cookie</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    border-top: 1px solid var(--color-line);
+    padding-block: 3rem 2rem;
+  }
+
+  .foot__top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .foot__name {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 9vw, 7rem);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(241, 241, 234, 0.28);
+    transition:
+      color 0.4s ease,
+      -webkit-text-stroke-color 0.4s ease;
+  }
+
+  .foot__name:hover {
+    color: var(--color-acid);
+    -webkit-text-stroke-color: var(--color-acid);
+  }
+
+  .foot__links {
+    display: flex;
+    gap: 1.4rem;
+    font-size: 0.85rem;
+    color: var(--color-mute);
+    padding-bottom: 0.5rem;
+  }
+
+  .foot__links a:hover {
+    color: var(--color-acid);
+  }
+
+  .foot__bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--color-line);
+    color: var(--color-mute);
+    font-size: 0.68rem;
+  }
+
+  @media (max-width: 640px) {
+    .foot__built {
+      display: none;
+    }
+  }
+</style>

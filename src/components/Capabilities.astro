@@ -1,0 +1,155 @@
+---
+import { site } from '../data/site';
+---
+
+<section class="section caps" id="capabilities">
+  <div class="wrap">
+    <header class="caps__head">
+      <div>
+        <p class="eyebrow" data-reveal>Capabilities</p>
+        <h2 class="section-title" data-reveal>
+          工具会过时，<br />
+          <span class="muted">手感不会。</span>
+        </h2>
+      </div>
+      <p class="caps__note mono" data-reveal>Always shipping, always breaking.</p>
+    </header>
+
+    <div class="caps__grid">
+      {site.capabilities.map((group, i) => (
+        <div class="caps__cell" data-reveal>
+          <div class="caps__top">
+            <span class="caps__index mono">{String(i + 1).padStart(2, '0')}</span>
+            <span class="caps__note mono">{group.note}</span>
+          </div>
+          <h3>{group.title}</h3>
+          <ul>
+            {group.items.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .caps__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: clamp(3rem, 7vh, 5rem);
+  }
+
+  .caps__note {
+    color: var(--color-mute);
+    padding-bottom: 0.6rem;
+  }
+
+  .caps__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--color-line);
+    border-left: 1px solid var(--color-line);
+  }
+
+  .caps__cell {
+    position: relative;
+    border-right: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--color-line);
+    padding: clamp(1.4rem, 2.6vw, 2.2rem);
+    min-height: 19rem;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.35s ease;
+  }
+
+  .caps__cell::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-acid);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .caps__cell:hover {
+    background: rgba(241, 241, 234, 0.025);
+  }
+
+  .caps__cell:hover::after {
+    transform: scaleX(1);
+  }
+
+  .caps__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+    color: var(--color-mute);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .caps__index {
+    color: var(--color-acid);
+    font-size: 0.66rem;
+  }
+
+  .caps__cell h3 {
+    margin-top: auto;
+    padding-top: 3rem;
+    font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .caps__cell ul {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .caps__cell li {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-mute);
+    transition: color 0.25s ease, transform 0.25s ease;
+  }
+
+  .caps__cell:hover li {
+    color: var(--color-paper);
+  }
+
+  .caps__cell li::before {
+    content: "— ";
+    color: rgba(201, 255, 61, 0.5);
+  }
+
+  @media (max-width: 1000px) {
+    .caps__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .caps__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .caps__cell {
+      min-height: 0;
+    }
+
+    .caps__cell h3 {
+      padding-top: 2rem;
+    }
+  }
+</style>

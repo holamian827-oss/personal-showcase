@@ -1,0 +1,125 @@
+---
+import { site } from '../data/site';
+---
+
+<section class="section contact" id="contact">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>Contact</p>
+
+    <h2 class="contact__title" data-reveal>
+      一起做点<br />
+      <span class="contact__em">有意思的事。</span>
+    </h2>
+
+    <a class="contact__mail" href={`mailto:${site.email}`} data-reveal>
+      <span class="contact__mail-text">{site.email}</span>
+      <span class="contact__mail-arrow" aria-hidden="true">↗</span>
+    </a>
+
+    <div class="contact__bottom" data-reveal>
+      <p class="mono muted">通常 24 小时内回复 · 远程 / 合作 / 安全项目</p>
+      <div class="contact__socials">
+        {site.socials.map((social) => (
+          <a class="mono" href={social.href} rel="noopener noreferrer">{social.label}</a>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding-bottom: clamp(4rem, 8vh, 7rem);
+  }
+
+  .contact__title {
+    margin-top: 1.6rem;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 9vw, 8rem);
+    font-weight: 500;
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+  }
+
+  .contact__em {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(241, 241, 234, 0.4);
+  }
+
+  .contact__mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: clamp(2.5rem, 6vh, 4.5rem);
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 2.2vw, 1.6rem);
+    letter-spacing: -0.01em;
+    transition:
+      color 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .contact__mail-text {
+    position: relative;
+  }
+
+  .contact__mail-text::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.35rem;
+    width: 100%;
+    height: 1px;
+    background: var(--color-acid);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .contact__mail:hover {
+    color: var(--color-acid);
+    border-color: transparent;
+  }
+
+  .contact__mail:hover .contact__mail-text::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .contact__mail-arrow {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .contact__mail:hover .contact__mail-arrow {
+    transform: translate(4px, -4px);
+  }
+
+  .contact__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: clamp(3rem, 8vh, 6rem);
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .contact__bottom p {
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+  }
+
+  .contact__socials {
+    display: flex;
+    gap: 1.4rem;
+    font-size: 0.72rem;
+    color: var(--color-mute);
+  }
+
+  .contact__socials a:hover {
+    color: var(--color-acid);
+  }
+</style>

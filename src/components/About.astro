@@ -1,0 +1,105 @@
+---
+import { site } from '../data/site';
+---
+
+<section class="section about" id="about">
+  <div class="wrap about__grid">
+    <div class="about__intro">
+      <p class="eyebrow" data-reveal>About</p>
+      <h2 class="section-title" data-reveal>
+        先拆系统，<br />
+        <span class="muted">再写代码。</span>
+      </h2>
+    </div>
+
+    <div class="about__body">
+      <p class="about__lead" data-reveal>
+        我是{site.name}，一名全栈开发者。白天搭产品，晚上拆安装包——这两件事其实是同一件事：
+        理解系统如何运作，然后让它更好用、更难被攻破。
+      </p>
+      <p data-reveal>
+        我喜欢小而锋利的技术选型：能静态就不上服务器，一个依赖能解决就不装十个。交付之前，
+        我会把边界条件、性能预算和失败路径都过一遍，而不是等它自己暴露。
+      </p>
+
+      <dl class="about__now" data-reveal>
+        {site.now.map((item) => (
+          <div class="about__now-row">
+            <dt class="mono">{item.label}</dt>
+            <dd>{item.text}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(2.5rem, 8vw, 8rem);
+  }
+
+  .about__intro {
+    align-self: start;
+  }
+
+  @media (min-width: 901px) {
+    .about__intro {
+      position: sticky;
+      top: clamp(7rem, 14vh, 9rem);
+    }
+  }
+
+  .about__body {
+    display: grid;
+    gap: 1.6rem;
+    padding-top: 0.35rem;
+  }
+
+  .about__lead {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    line-height: 1.65;
+    letter-spacing: -0.01em;
+  }
+
+  .about__body > p:not(.about__lead) {
+    color: var(--color-mute);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    max-width: 38rem;
+  }
+
+  .about__now {
+    margin: 1.4rem 0 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .about__now-row {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: 1rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .about__now-row dt {
+    color: var(--color-acid);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding-top: 0.15rem;
+  }
+
+  .about__now-row dd {
+    margin: 0;
+    font-size: 0.92rem;
+  }
+
+  @media (max-width: 900px) {
+    .about__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
