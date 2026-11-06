@@ -101,6 +101,17 @@ const year = new Date().getFullYear();
     isolation: isolate;
   }
 
+  /* 底部软化，让球体和下一段之间不是一刀切 */
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 22vh;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, var(--color-ink) 88%);
+  }
+
   .hero__inner {
     display: flex;
     flex-direction: column;

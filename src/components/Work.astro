@@ -115,6 +115,14 @@ const year = new Date().getFullYear();
     color: var(--color-mute);
     font-size: 0.7rem;
     padding-top: 0.65rem;
+    transition:
+      color 0.3s ease,
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .work__row:not(.is-static):hover .work__index {
+    color: var(--color-acid);
+    transform: translateY(-2px);
   }
 
   .work__main {
