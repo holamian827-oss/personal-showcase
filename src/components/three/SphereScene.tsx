@@ -17,6 +17,7 @@ function SphereRig({ quality, reduced }: { quality: Quality; reduced: boolean })
   const group = useRef<THREE.Group>(null);
   const ring = useRef<THREE.Group>(null);
   const mouse = useRef({ x: 0, y: 0 });
+  const markedLive = useRef(false);
 
   const points = useMemo(() => {
     const count = quality === 'high' ? 1200 : 560;
@@ -45,6 +46,12 @@ function SphereRig({ quality, reduced }: { quality: Quality; reduced: boolean })
   useFrame((state, delta) => {
     const g = group.current;
     if (!g) return;
+
+    // 第一帧真正画出来之后才隐藏静态占位球，避免 WebGL 失败时白屏
+    if (!markedLive.current) {
+      markedLive.current = true;
+      document.querySelector('.hero__stage')?.classList.add('is-live');
+    }
     const d = Math.min(delta, 0.05);
     const t = state.clock.elapsedTime;
     const narrow = state.size.width < 900;
@@ -85,9 +92,9 @@ function SphereRig({ quality, reduced }: { quality: Quality; reduced: boolean })
         <icosahedronGeometry args={[1.55, 3]} />
         <meshBasicMaterial
           wireframe
-          color="#d6ff73"
+          color="#f1f1ea"
           transparent
-          opacity={0.32}
+          opacity={0.36}
           depthWrite={false}
         />
       </mesh>
@@ -97,9 +104,9 @@ function SphereRig({ quality, reduced }: { quality: Quality; reduced: boolean })
         <icosahedronGeometry args={[1.55, 2]} />
         <meshBasicMaterial
           wireframe
-          color="#f1f1ea"
+          color="#c9ff3d"
           transparent
-          opacity={0.1}
+          opacity={0.11}
           depthWrite={false}
         />
       </mesh>
@@ -184,6 +191,11 @@ export default function SphereScene() {
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       style={{ width: '100%', height: '100%' }}
       aria-hidden="true"
+      onCreated={({ gl }) => {
+        gl.domElement.addEventListener('webglcontextlost', () => {
+          document.querySelector('.hero__stage')?.classList.remove('is-live');
+        });
+      }}
     >
       <SphereRig quality={quality} reduced={reduced} />
     </Canvas>
