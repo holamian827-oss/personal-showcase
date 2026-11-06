@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1200px; height: 630px;
+    background: #050607; color: #f1f1ea;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    overflow: hidden; position: relative;
+  }
+  body::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 78% 48%, rgba(201,255,61,.14), transparent 45%),
+      linear-gradient(90deg, transparent 49.9%, rgba(241,241,234,.06) 50%, transparent 50.1%);
+  }
+  .sphere {
+    position: absolute; right: -105px; top: -55px;
+    width: 700px; height: 700px; opacity: .62;
+  }
+  .content {
+    position: absolute; inset: 0; padding: 60px 72px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top, .bottom {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: Consolas, "Cascadia Mono", monospace;
+    font-size: 13px; letter-spacing: .2em; color: #8b8f87;
+    text-shadow: 0 1px 12px rgba(5, 6, 7, .95);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; color: #f1f1ea; letter-spacing: .04em; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #c9ff3d; box-shadow: 0 0 18px rgba(201,255,61,.8);
+  }
+  .brand em { font-style: normal; font-size: 10px; letter-spacing: .24em; color: #8b8f87; }
+  .kicker {
+    font-family: Consolas, monospace; font-size: 13px;
+    letter-spacing: .18em; color: #8b8f87; margin-bottom: 26px;
+  }
+  h1 {
+    margin: 0; font-size: 116px; line-height: .95;
+    letter-spacing: -.055em; font-weight: 700;
+  }
+  h1 span { color: #62665f; }
+  .mail { color: #f1f1ea; }
+</style>
+</head>
+<body>
+  <svg class="sphere" viewBox="0 0 400 400" fill="none" stroke="#c9ff3d">
+    <circle cx="200" cy="200" r="150" stroke-opacity=".55" stroke-width="1.2"/>
+    <ellipse cx="200" cy="200" rx="150" ry="52" stroke-opacity=".35" stroke-width="1"/>
+    <ellipse cx="200" cy="200" rx="150" ry="105" stroke-opacity=".28" stroke-width="1"/>
+    <ellipse cx="200" cy="200" rx="52" ry="150" stroke-opacity=".35" stroke-width="1"/>
+    <ellipse cx="200" cy="200" rx="105" ry="150" stroke-opacity=".28" stroke-width="1"/>
+    <ellipse cx="200" cy="200" rx="150" ry="52" stroke-opacity=".25" stroke-width="1" transform="rotate(38 200 200)"/>
+    <ellipse cx="200" cy="200" rx="150" ry="52" stroke-opacity=".25" stroke-width="1" transform="rotate(-38 200 200)"/>
+    <ellipse cx="200" cy="200" rx="150" ry="105" stroke-opacity=".18" stroke-width="1" transform="rotate(64 200 200)"/>
+    <ellipse cx="200" cy="200" rx="150" ry="105" stroke-opacity=".18" stroke-width="1" transform="rotate(-64 200 200)"/>
+    <circle cx="330" cy="140" r="3" fill="#c9ff3d" stroke="none"/>
+    <circle cx="76" cy="258" r="2.5" fill="#c9ff3d" stroke="none"/>
+    <circle cx="245" cy="52" r="2" fill="#c9ff3d" stroke="none"/>
+  </svg>
+
+  <div class="content">
+    <div class="top">
+      <div class="brand">
+        <span class="dot"></span>
+        李嘉宏 <em>LI JIAHONG</em>
+      </div>
+      <span>PORTFOLIO / 2026</span>
+    </div>
+
+    <div>
+      <div class="kicker">— FULL-STACK DEVELOPER / SECURITY RESEARCHER</div>
+      <h1>把复杂做简单，<br /><span>把简单做狠。</span></h1>
+    </div>
+
+    <div class="bottom">
+      <span class="mail">holamian827@gmail.com</span>
+      <span>ASTRO · R3F · GSAP</span>
+    </div>
+  </div>
+</body>
+</html>

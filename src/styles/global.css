@@ -75,6 +75,12 @@ a {
   text-decoration: none;
 }
 
+a,
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 img,
 svg,
 canvas {
@@ -97,6 +103,16 @@ h2,
 h3,
 p {
   margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 
 .wrap {
@@ -165,6 +181,51 @@ p {
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
+}
+
+html.menu-open,
+html.menu-open body {
+  overflow: hidden;
+}
+
+/* WebGL 不可用时由 React 降级渲染的纯 CSS 线框球（需全局样式，scoped 不生效） */
+.sphere-fallback {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.sphere-fallback span {
+  position: absolute;
+  border: 1px solid rgba(201, 255, 61, 0.22);
+  border-radius: 50%;
+}
+
+.sphere-fallback span:nth-child(1) {
+  width: 58%;
+  height: 58%;
+}
+
+.sphere-fallback span:nth-child(2) {
+  width: 58%;
+  height: 22%;
+}
+
+.sphere-fallback span:nth-child(3) {
+  width: 22%;
+  height: 58%;
+}
+
+/* 自定义光标启用后隐藏原生指针，JS 失败则不加类 */
+@media (hover: hover) and (pointer: fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button {
+    cursor: none;
+  }
 }
 
 .progress {

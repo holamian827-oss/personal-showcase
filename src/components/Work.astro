@@ -1,5 +1,7 @@
 ---
 import { site } from '../data/site';
+
+const year = new Date().getFullYear();
 ---
 
 <section class="section work" id="work">
@@ -13,7 +15,7 @@ import { site } from '../data/site';
         </h2>
       </div>
       <p class="work__count mono" data-reveal>
-        {String(site.projects.length).padStart(2, '0')} PROJECTS — 2026
+        {String(site.projects.length).padStart(2, '0')} PROJECTS — {year}
       </p>
     </header>
 
@@ -25,7 +27,7 @@ import { site } from '../data/site';
           : {};
         return (
           <li class="work__item" data-reveal>
-            <Tag class="work__row" {...linkProps}>
+            <Tag class:list={['work__row', { 'is-static': !project.href }]} {...linkProps}>
               <span class="work__index mono">{project.index}</span>
 
               <div class="work__main">
@@ -100,11 +102,11 @@ import { site } from '../data/site';
     pointer-events: none;
   }
 
-  .work__row:hover {
+  .work__row:not(.is-static):hover {
     padding-inline: 0.9rem;
   }
 
-  .work__row:hover::before {
+  .work__row:not(.is-static):hover::before {
     opacity: 1;
     transform: scaleX(1);
   }
@@ -135,7 +137,7 @@ import { site } from '../data/site';
     transition: color 0.3s ease;
   }
 
-  .work__row:hover h3 {
+  .work__row:not(.is-static):hover h3 {
     color: var(--color-acid);
   }
 
@@ -188,7 +190,7 @@ import { site } from '../data/site';
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .work__row:hover .work__arrow {
+  .work__row:not(.is-static):hover .work__arrow {
     transform: translate(4px, -4px);
     color: var(--color-acid);
   }

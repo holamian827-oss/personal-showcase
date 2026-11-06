@@ -11,10 +11,22 @@ import { site } from '../data/site';
       <span class="contact__em">有意思的事。</span>
     </h2>
 
-    <a class="contact__mail" href={`mailto:${site.email}`} data-reveal>
-      <span class="contact__mail-text">{site.email}</span>
-      <span class="contact__mail-arrow" aria-hidden="true">↗</span>
-    </a>
+    <div class="contact__mail-row" data-reveal>
+      <a class="contact__mail" href={`mailto:${site.email}`} data-magnetic>
+        <span class="contact__mail-text">{site.email}</span>
+        <span class="contact__mail-arrow" aria-hidden="true">↗</span>
+      </a>
+
+      <button
+        class="contact__copy mono"
+        type="button"
+        data-copy={site.email}
+        aria-label={`复制邮箱 ${site.email}`}
+      >
+        <span data-copy-label>复制</span>
+      </button>
+      <span class="sr-only" role="status" aria-live="polite" data-copy-status></span>
+    </div>
 
     <div class="contact__bottom" data-reveal>
       <p class="mono muted">通常 24 小时内回复 · 远程 / 合作 / 安全项目</p>
@@ -46,11 +58,43 @@ import { site } from '../data/site';
     -webkit-text-stroke: 1px rgba(241, 241, 234, 0.4);
   }
 
+  .contact__mail-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  .contact__copy {
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: none;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    color: var(--color-mute);
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease,
+      background 0.25s ease;
+  }
+
+  .contact__copy:hover {
+    color: var(--color-paper);
+    border-color: rgba(241, 241, 234, 0.32);
+  }
+
+  .contact__copy.is-done {
+    color: #050607;
+    background: var(--color-acid);
+    border-color: var(--color-acid);
+  }
+
   .contact__mail {
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    margin-top: clamp(2.5rem, 6vh, 4.5rem);
     padding-bottom: 0.4rem;
     border-bottom: 1px solid var(--color-line);
     font-family: var(--font-mono);
@@ -123,3 +167,55 @@ import { site } from '../data/site';
     color: var(--color-acid);
   }
 </style>
+
+<script>
+  const copyButton = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const copyLabel = copyButton?.querySelector<HTMLElement>('[data-copy-label]');
+  const copyStatus = document.querySelector<HTMLElement>('[data-copy-status]');
+  let resetTimer: number | undefined;
+
+  const copyText = async (value: string) => {
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(value);
+        return;
+      } catch {
+        /* 权限被拒时走 execCommand 兜底 */
+      }
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = value;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    const ok = document.execCommand('copy');
+    textarea.remove();
+
+    if (!ok) throw new Error('copy failed');
+  };
+
+  copyButton?.addEventListener('click', async () => {
+    const value = copyButton.dataset.copy ?? '';
+    if (!value) return;
+
+    try {
+      await copyText(value);
+    } catch {
+      window.location.href = `mailto:${value}`;
+      return;
+    }
+
+    copyButton.classList.add('is-done');
+    if (copyLabel) copyLabel.textContent = '已复制';
+    if (copyStatus) copyStatus.textContent = `邮箱 ${value} 已复制到剪贴板`;
+
+    window.clearTimeout(resetTimer);
+    resetTimer = window.setTimeout(() => {
+      copyButton.classList.remove('is-done');
+      if (copyLabel) copyLabel.textContent = '复制';
+    }, 1800);
+  });
+</script>

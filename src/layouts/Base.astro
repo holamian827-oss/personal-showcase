@@ -10,14 +10,17 @@ import { url } from '../lib/url';
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
 }
 
 const {
   title = `${site.name} — ${site.role}`,
   description = site.intro,
+  noindex = false,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(url('/og.png'), Astro.site).href;
 const socialUrls = site.socials
   .map((s) => s.href)
   .filter((href) => href.startsWith('http'));
@@ -41,11 +44,14 @@ const personLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+    <link rel="icon" href={url('/favicon.ico')} sizes="64x64" />
     <meta name="theme-color" content="#050607" />
     <meta name="color-scheme" content="dark" />
     <meta name="author" content={site.name} />
+    <meta name="format-detection" content="telephone=no" />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -53,10 +59,15 @@ const personLd = {
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="zh_CN" />
     <meta property="og:site_name" content={site.name} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name} — ${site.role}`} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
 
     <script is:inline>
       document.documentElement.classList.add('js');

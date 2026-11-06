@@ -25,17 +25,23 @@ jobs:
           node-version: 22
           cache: npm
 
-      # 用户主页仓库（<owner>.github.io）base 为 '/'，项目仓库为 '/<repo>'。
+      # 优先级：仓库变量 SITE_URL（套 CDN / 自定义域名）> 用户主页仓库 > 普通项目仓库。
       - name: Resolve site URL and base path
         run: |
           OWNER="${{ github.repository_owner }}"
           REPO="${{ github.event.repository.name }}"
-          if [ "$REPO" = "$OWNER.github.io" ]; then
+          CUSTOM="${{ vars.SITE_URL }}"
+
+          if [ -n "$CUSTOM" ]; then
+            echo "SITE_URL=$CUSTOM" >> "$GITHUB_ENV"
+            echo "BASE_PATH=/" >> "$GITHUB_ENV"
+          elif [ "$REPO" = "$OWNER.github.io" ]; then
+            echo "SITE_URL=https://$OWNER.github.io" >> "$GITHUB_ENV"
             echo "BASE_PATH=/" >> "$GITHUB_ENV"
           else
+            echo "SITE_URL=https://$OWNER.github.io" >> "$GITHUB_ENV"
             echo "BASE_PATH=/$REPO" >> "$GITHUB_ENV"
           fi
-          echo "SITE_URL=https://$OWNER.github.io" >> "$GITHUB_ENV"
 
       - run: npm ci
       - run: npm run build

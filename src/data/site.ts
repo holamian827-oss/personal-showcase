@@ -16,11 +16,8 @@ export const site = {
     '我写代码，也拆代码。关注 Web 架构、Cloudflare 生态与移动端逆向。喜欢用最少的依赖做出最快的页面，也喜欢把一个系统从里到外看透。',
 
   // TODO: 换成你的真实邮箱与主页
-  email: 'hello@lijiahong.dev',
-  socials: [
-    { label: 'GitHub', href: 'https://github.com/' },
-    { label: 'Email', href: 'mailto:hello@lijiahong.dev' },
-  ],
+  email: 'holamian827@gmail.com',
+  socials: [{ label: 'Email', href: 'mailto:holamian827@gmail.com' }],
 
   facts: [
     { k: 'Based', v: '中国 · 远程' },

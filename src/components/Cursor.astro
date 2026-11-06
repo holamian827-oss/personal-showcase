@@ -68,6 +68,8 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   if (root && dot && ring && fine.matches && !reduced.matches) {
+    document.documentElement.classList.add('has-custom-cursor');
+
     const dotX = gsap.quickTo(dot, 'x', { duration: 0.12, ease: 'power3.out' });
     const dotY = gsap.quickTo(dot, 'y', { duration: 0.12, ease: 'power3.out' });
     const ringX = gsap.quickTo(ring, 'x', { duration: 0.45, ease: 'power3.out' });

@@ -4,17 +4,38 @@ import { site } from '../data/site';
 import { anchor } from '../lib/url';
 
 const chars = [...site.name];
+const year = new Date().getFullYear();
 ---
 
 <section class="hero" id="top">
   <div class="hero__glow" aria-hidden="true"></div>
   <div class="hero__stage" aria-hidden="true">
-    <SphereScene client:only="react" />
+    <div class="hero__ghost">
+      <svg viewBox="0 0 400 400" fill="none" stroke="currentColor" aria-hidden="true">
+        <g class="hero__ghost-spin">
+          <circle cx="200" cy="200" r="150" stroke-opacity=".7" />
+          <ellipse cx="200" cy="200" rx="150" ry="52" stroke-opacity=".5" />
+          <ellipse cx="200" cy="200" rx="150" ry="105" stroke-opacity=".35" />
+          <ellipse cx="200" cy="200" rx="52" ry="150" stroke-opacity=".5" />
+          <ellipse cx="200" cy="200" rx="105" ry="150" stroke-opacity=".35" />
+          <ellipse cx="200" cy="200" rx="150" ry="52" stroke-opacity=".35" transform="rotate(38 200 200)" />
+          <ellipse cx="200" cy="200" rx="150" ry="52" stroke-opacity=".35" transform="rotate(-38 200 200)" />
+          <ellipse cx="200" cy="200" rx="150" ry="105" stroke-opacity=".22" transform="rotate(64 200 200)" />
+          <ellipse cx="200" cy="200" rx="150" ry="105" stroke-opacity=".22" transform="rotate(-64 200 200)" />
+        </g>
+        <circle cx="330" cy="140" r="3" fill="currentColor" stroke="none" />
+        <circle cx="76" cy="258" r="2.5" fill="currentColor" stroke="none" />
+        <circle cx="245" cy="52" r="2" fill="currentColor" stroke="none" />
+      </svg>
+    </div>
+    <div class="hero__canvas">
+      <SphereScene client:only="react" />
+    </div>
   </div>
 
   <div class="wrap hero__inner">
     <div class="hero__copy">
-      <p class="eyebrow" data-hero-anim style="--d: 0.05s">Portfolio — 2026</p>
+      <p class="eyebrow" data-hero-anim style="--d: 0.05s">Portfolio — {year}</p>
 
       <h1 class="hero__title" aria-label={site.name} data-hero-anim style="--d: 0.12s">
         {chars.map((char, i) => (
@@ -37,13 +58,13 @@ const chars = [...site.name];
       <p class="hero__intro muted" data-hero-anim style="--d: 0.38s">{site.intro}</p>
 
       <div class="hero__actions" data-hero-anim style="--d: 0.46s">
-        <a class="btn btn--solid" href={anchor('#work')}>
+        <a class="btn btn--solid" href={anchor('#work')} data-magnetic>
           看看作品
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" />
           </svg>
         </a>
-        <a class="btn" href={`mailto:${site.email}`}>聊聊合作</a>
+        <a class="btn" href={`mailto:${site.email}`} data-magnetic>聊聊合作</a>
       </div>
     </div>
 
@@ -117,7 +138,26 @@ const chars = [...site.name];
   }
 
   .hero__copy {
+    position: relative;
     max-width: 44rem;
+    isolation: isolate;
+  }
+
+  /* 文字压在球体线框上时，铺一层软暗角保证可读性 */
+  @media (min-width: 721px) {
+    .hero__copy::before {
+      content: "";
+      position: absolute;
+      inset: -3rem -9rem -3rem -6rem;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(
+        ellipse 62% 56% at 34% 46%,
+        rgba(5, 6, 7, 0.88) 0%,
+        rgba(5, 6, 7, 0.55) 48%,
+        transparent 76%
+      );
+    }
   }
 
   .hero__title {
@@ -306,34 +346,53 @@ const chars = [...site.name];
     }
   }
 
-  /* WebGL 不可用时的纯 CSS 线框球 */
-  .sphere-fallback {
-    position: relative;
-    width: 100%;
-    height: 100%;
+  /* 3D 水合前的占位球，避免首屏空白 */
+  .hero__ghost {
+    position: absolute;
+    inset: 0;
     display: grid;
     place-items: center;
+    z-index: 0;
+    opacity: 0.55;
+    transition: opacity 0.8s ease;
+    animation: ghost-in 1.4s ease both;
   }
 
-  .sphere-fallback span {
+  .hero__canvas {
     position: absolute;
-    border: 1px solid rgba(201, 255, 61, 0.22);
-    border-radius: 50%;
+    inset: 0;
+    z-index: 1;
   }
 
-  .sphere-fallback span:nth-child(1) {
-    width: 58%;
-    height: 58%;
+  .hero__ghost svg {
+    width: 86%;
+    height: auto;
+    color: rgba(214, 255, 115, 0.34);
+    stroke-width: 0.9;
   }
 
-  .sphere-fallback span:nth-child(2) {
-    width: 58%;
-    height: 22%;
+  .hero__ghost-spin {
+    transform-origin: 200px 200px;
+    animation: ghost-spin 80s linear infinite;
   }
 
-  .sphere-fallback span:nth-child(3) {
-    width: 22%;
-    height: 58%;
+  @keyframes ghost-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .hero__stage:has(.hero__canvas canvas) .hero__ghost {
+    opacity: 0;
+  }
+
+  @keyframes ghost-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.55;
+    }
   }
 
   @media (max-width: 900px) {
@@ -390,6 +449,10 @@ const chars = [...site.name];
     .hero__scroll-line::after {
       animation: none;
       transform: translateY(0);
+    }
+
+    .hero__ghost-spin {
+      animation: none;
     }
   }
 </style>

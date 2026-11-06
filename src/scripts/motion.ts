@@ -6,6 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 ScrollTrigger.config({ ignoreMobileResize: true });
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 let lenis: Lenis | undefined;
 
@@ -72,6 +73,29 @@ if (!reduced) {
       end: 'bottom top',
       scrub: true,
     },
+  });
+}
+
+/* 磁吸：只给主按钮一点点“手感”，桌面端生效 */
+if (!reduced && finePointer) {
+  document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => {
+    const xTo = gsap.quickTo(el, 'x', { duration: 0.45, ease: 'power3.out' });
+    const yTo = gsap.quickTo(el, 'y', { duration: 0.45, ease: 'power3.out' });
+
+    el.addEventListener(
+      'pointermove',
+      (event) => {
+        const rect = el.getBoundingClientRect();
+        xTo((event.clientX - (rect.left + rect.width / 2)) * 0.16);
+        yTo((event.clientY - (rect.top + rect.height / 2)) * 0.22);
+      },
+      { passive: true },
+    );
+
+    el.addEventListener('pointerleave', () => {
+      xTo(0);
+      yTo(0);
+    });
   });
 }
 

@@ -50,7 +50,7 @@ function SphereRig({ quality, reduced }: { quality: Quality; reduced: boolean })
     const narrow = state.size.width < 900;
     const scroll = Math.min(window.scrollY / Math.max(window.innerHeight, 1), 1);
 
-    if (!reduced) g.rotation.y += d * 0.11;
+    if (!reduced) g.rotation.y += d * 0.14;
     g.rotation.x = THREE.MathUtils.damp(
       g.rotation.x,
       reduced ? 0.12 : mouse.current.y * 0.22,
@@ -85,9 +85,9 @@ function SphereRig({ quality, reduced }: { quality: Quality; reduced: boolean })
         <icosahedronGeometry args={[1.55, 3]} />
         <meshBasicMaterial
           wireframe
-          color="#c9ff3d"
+          color="#d6ff73"
           transparent
-          opacity={0.2}
+          opacity={0.32}
           depthWrite={false}
         />
       </mesh>
@@ -99,7 +99,7 @@ function SphereRig({ quality, reduced }: { quality: Quality; reduced: boolean })
           wireframe
           color="#f1f1ea"
           transparent
-          opacity={0.07}
+          opacity={0.1}
           depthWrite={false}
         />
       </mesh>
@@ -114,7 +114,7 @@ function SphereRig({ quality, reduced }: { quality: Quality; reduced: boolean })
           sizeAttenuation
           color="#c9ff3d"
           transparent
-          opacity={0.78}
+          opacity={0.88}
           depthWrite={false}
         />
       </points>
