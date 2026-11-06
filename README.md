@@ -56,18 +56,22 @@ npm run preview
 
 在仓库 Settings → Pages 填域名，并在 `public/` 下放一个 `CNAME` 文件（内容为域名）。
 
-**方案二：CloudFront 套在 GitHub Pages 前面（推荐，可加缓存与自定义域名）**
+**方案二：CloudFront 套在 GitHub Pages 前面（澳门/香港推荐）**
 
 1. 仓库 **Settings → Variables → Actions** 新建变量 `SITE_URL=https://你的域名`。
-   工作流会自动把 `BASE_PATH` 设为 `/`（即使仓库是项目仓库），canonical / OG / sitemap 也会用该域名。
+   工作流会自动把 `BASE_PATH` 设为 `/`，canonical / OG / sitemap 也会用该域名。
 2. CloudFront：
-   - Origin 填 `<用户名>.github.io`，协议 HTTPS only。
-   - **不要**开启 “Forward Host header”；否则 GitHub Pages 会 301 回自定义域名，形成循环。
-   - 自定义域名用 ACM 证书（证书必须签在 **us-east-1**），DNS 把域名 CNAME / Alias 到 CloudFront。
-3. 缓存策略：`/_astro/*` 长缓存（文件名自带 hash），HTML 用 0–60 秒；每次部署后对 `/*` 做一次 invalidation。
-4. 不要在 GitHub Pages 里再填同一个自定义域名，CloudFront 与 Pages 二选一作为对外入口。
+   - Origin 填 `<用户名>.github.io`，协议 HTTPS only，**不要**开启 “Forward Host header”。
+   - **不要**给 GitHub Pages 配自定义域名、也不要放 `CNAME` 文件；否则 Pages 会 301 回你的域名，和 CloudFront 形成循环。
+   - 自定义域名用 ACM 证书（必须签在 **us-east-1**），Cloudflare DNS 里 CNAME 到 CloudFront，**Proxy 必须关（灰云）**。
+   - Price Class 选 All，确保走香港边缘节点。
+3. **仓库形态**：
+   - 用 `<用户名>.github.io` 仓库最省事，base 为 `/`，CloudFront 直接回源根路径。
+   - 如果是普通项目仓库且设置了 `SITE_URL`（base `/`），要在 CloudFront Origin 里加 **Origin Path `/<仓库名>`**，否则根路径会 404。
+4. 缓存策略：`/_astro/*` 长缓存；HTML 0–60 秒。部署后可用工作流自动 invalidation：
+   仓库变量 `CLOUDFRONT_DISTRIBUTION_ID` + secrets `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`，`deploy.yml` 里已预留步骤。
 
-> 注意：CloudFront 全球边缘节点**不含中国大陆**。面向大陆用户时，回源和边缘通常在 HK/东京/新加坡，加速有限；如需大陆加速，要使用 CloudFront 中国区（需 ICP 备案）或国内 CDN。
+> 澳门/香港：CloudFront 无本地节点，流量落到香港（HKG），到澳门 RTT 约 10–25ms，不需要 ICP，也不需要 CloudFront 中国区。大陆用户可访问但速度不保证。
 
 ## 结构
 
