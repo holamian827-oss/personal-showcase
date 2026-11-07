@@ -91,23 +91,30 @@ src/
 
 ## 代码保护
 
-前端代码最终一定会下发到浏览器，混淆只能提高复制成本，不能真正保密。本项目在**生产构建**里做轻量混淆：
+前端代码最终一定会下发到浏览器，混淆只能提高复制成本，不能真正保密。本项目生产构建启用了较重的保护：
 
 - 只处理自有脚本（SphereGL / Base / Cursor / Nav / Contact），跳过 GSAP 等第三方
-- 开启：标识符重命名、字符串数组
-- 关闭：控制流扁平化、死代码注入、selfDefending、debugProtection（这些会明显拖慢或破坏运行）
+- 开启：标识符重命名、RC4 字符串数组、控制流扁平化（0.5）、死代码注入（0.2）、debugProtection（每 2 秒）
+- 关闭：selfDefending（实测会破坏加载）
+- 粒子分布核心用 **AssemblyScript 编译成 WASM**（`sphere-core.wasm`），JS 侧只剩缓冲区和 WebGL 调用，加载失败自动回退 JS 版本
 - 在 `renderChunk` 阶段执行，文件名 hash 与最终内容一致，**CloudFront / 浏览器缓存不会错版本**
 
 ```bash
+npm run wasm:build      # 重新编译 WASM 核心
 npm run build:protect   # 本地体验生产混淆
 ```
 
-CI 里通过 `OBFUSCATE=1` 自动启用。仓库本身是公开的，如果目标是隐藏源码，需要把仓库转私有并更换托管（GitHub Pages 免费版不支持私有仓库）。
+CI 里通过 `OBFUSCATE=1` 自动启用。注意：
+
+- debugProtection 会在打开 DevTools 时周期性暂停页面，属于「恶心人」手段，绕过成本不高，也会影响正常调试
+- WASM 只保护粒子分布逻辑；**GLSL 着色器仍然以字符串形式可见**，反调试也挡不住禁用 JS 或本地替换
+- 想要更高一档，需要商业化 JSVMP / Jscrambler，代价是体积和运行开销
+- 仓库本身是公开的；如果目标是隐藏源码，还是得转私有仓库 + 换托管
 
 ## 性能备注
 
-- 首屏球体 + 粒子层约 5 KB gzip：零 three.js / React，两个 shader program、4 次 draw call（线框 + 点云 + 轨道 + 1.2 万粒子）；滚出视口自动停渲染，DPR 上限 1.5。
-- 全站 JS 约 56 KB gzip（GSAP 27 + 动效 23 + 球体 5 + 光标 0.5），CSS 约 9 KB gzip。
+- 首屏球体 + 粒子层：未混淆约 5 KB gzip，生产混淆后约 15 KB gzip；另加 14 KB WASM。零 three.js / React，两个 shader program、4 次 draw call（线框 + 点云 + 轨道 + 1.2 万粒子）；滚出视口自动停渲染，DPR 上限 1.5。
+- 全站 JS：未混淆约 56 KB gzip，生产混淆后约 145 KB gzip（GSAP 27 + 动效 98 + 球体 15 + 其他），CSS 约 9 KB gzip。混淆带来的体积增长是安全换来的，运行时热路径仍在 GPU。
 - 球体加载前由内联 SVG 线框球占位，WebGL2 不可用时直接保留它，不会出现空白。
 - 字体内置于 npm 包（`@fontsource-variable/space-grotesk`），不依赖 Google Fonts，国内访问稳定。
 - 全站无 Cookie、无第三方分析脚本；需要统计时建议接 Umami 或 Plausible。

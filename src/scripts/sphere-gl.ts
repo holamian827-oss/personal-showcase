@@ -4,8 +4,37 @@
  * 线框、点云、轨道环分 3 次 draw call，首屏 JS 从 ~300 KB gzip 降到 ~10 KB。
  */
 
+import wasmUrl from '../wasm/sphere-core.wasm?url';
+
 type Vec3 = [number, number, number];
 type Quality = 'high' | 'low';
+
+type SphereWasm = {
+  memory: WebAssembly.Memory;
+  __new: (size: number, id: number) => number;
+  fillParticles: (count: number, ptr: number) => void;
+};
+
+/** 核心粒子分布由 WASM 生成；失败时保留 JS 版本，不影响渲染。 */
+async function particlesFromWasm(count: number): Promise<Float32Array | null> {
+  try {
+    const response = await fetch(wasmUrl);
+    const bytes = await response.arrayBuffer();
+    const { instance } = await WebAssembly.instantiate(bytes, {
+      env: {
+        abort: () => {
+          throw new Error('wasm abort');
+        },
+      },
+    });
+    const wasm = instance.exports as unknown as SphereWasm;
+    const ptr = wasm.__new(count * 5 * 4, 0);
+    wasm.fillParticles(count, ptr);
+    return new Float32Array(wasm.memory.buffer, ptr, count * 5).slice();
+  } catch {
+    return null;
+  }
+}
 
 const normalize = (v: Vec3): Vec3 => {
   const l = Math.hypot(v[0], v[1], v[2]) || 1;
@@ -355,6 +384,14 @@ export function mountSphere(canvas: HTMLCanvasElement): (() => void) | null {
   const satelliteBuffer = createBuffer(new Float32Array([0, 0, 0]));
   const particleCount = quality === 'high' ? 12000 : 4500;
   const particleBuffer = createBuffer(particleField(particleCount));
+
+  // 异步用 WASM 生成的分布替换 JS 版本
+  particlesFromWasm(particleCount).then((data) => {
+    if (!data) return;
+    gl.bindBuffer(gl.ARRAY_BUFFER, particleBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    canvas.dataset.wasm = '1';
+  });
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "build:protect": "cross-env OBFUSCATE=1 astro build"
+    "build:protect": "cross-env OBFUSCATE=1 astro build",
+    "wasm:build": "asc src/wasm/sphere-core.ts -o src/wasm/sphere-core.wasm --optimize --exportRuntime --target release"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -19,6 +20,7 @@
     "tailwindcss": "^4.3.4"
   },
   "devDependencies": {
+    "assemblyscript": "^0.28.20",
     "cross-env": "^10.1.0",
     "javascript-obfuscator": "^5.10.0",
     "typescript": "^7.0.2"
