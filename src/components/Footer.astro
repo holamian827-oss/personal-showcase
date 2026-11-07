@@ -1,6 +1,6 @@
 ---
 import { site } from '../data/site';
-import { anchor } from '../lib/url';
+import { anchor, url } from '../lib/url';
 
 const year = new Date().getFullYear();
 ---
@@ -11,6 +11,7 @@ const year = new Date().getFullYear();
       <a class="foot__name" href={anchor('#top')} aria-label="回到顶部">{site.name}</a>
       <div class="foot__links">
         {site.socials.map((s) => <a href={s.href} rel="noopener noreferrer">{s.label}</a>)}
+        <a href={url('/rss.xml')}>RSS</a>
       </div>
     </div>
 

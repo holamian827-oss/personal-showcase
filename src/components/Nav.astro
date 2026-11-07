@@ -23,6 +23,10 @@ const links = [
     </nav>
 
     <div class="nav__right">
+      <button class="nav__kbd mono" type="button" data-cmdk-open aria-label="打开命令面板">
+        <span data-kbd-label>⌘K</span>
+      </button>
+
       <a class="nav__cta mono" href={`mailto:${site.email}`} data-magnetic>
         <span data-local-time>--:--</span>
         <span class="nav__cta-label">HIRE ME</span>
@@ -55,6 +59,9 @@ const links = [
   <div class="menu__foot">
     <a class="mono" href={`mailto:${site.email}`}>{site.email}</a>
     <span class="mono muted">{site.location} · {site.availability}</span>
+    <button class="menu__cmdk mono" type="button" data-cmdk-open>
+      <span data-kbd-label>⌘K</span> 命令面板
+    </button>
   </div>
 </div>
 
@@ -155,6 +162,24 @@ const links = [
     display: flex;
     align-items: center;
     gap: 1rem;
+  }
+
+  .nav__kbd {
+    padding: 0.34rem 0.55rem;
+    border: 1px solid var(--color-line);
+    border-radius: 6px;
+    background: none;
+    color: var(--color-mute);
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .nav__kbd:hover {
+    color: var(--color-paper);
+    border-color: rgba(241, 241, 234, 0.32);
   }
 
   .nav__cta {
@@ -301,10 +326,27 @@ const links = [
     color: var(--color-paper);
   }
 
+  .menu__cmdk {
+    align-self: flex-start;
+    margin-top: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: none;
+    color: var(--color-mute);
+    font-size: 0.66rem;
+  }
+
+  .menu__cmdk:hover {
+    color: var(--color-paper);
+    border-color: rgba(241, 241, 234, 0.32);
+  }
+
   @media (max-width: 860px) {
     .nav__links,
     .nav__en,
-    .nav__cta {
+    .nav__cta,
+    .nav__kbd {
       display: none;
     }
 

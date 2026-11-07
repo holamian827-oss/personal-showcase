@@ -1,0 +1,422 @@
+---
+import { site } from '../data/site';
+import { anchor } from '../lib/url';
+
+const commands = [
+  { id: 'jump-work', label: '作品', hint: '查看精选项目', group: '跳转', href: anchor('#work') },
+  { id: 'jump-about', label: '关于', hint: '经历与工作方式', group: '跳转', href: anchor('#about') },
+  { id: 'jump-caps', label: '能力', hint: '技术栈与工具', group: '跳转', href: anchor('#capabilities') },
+  { id: 'jump-contact', label: '联系', hint: '邮箱与合作方式', group: '跳转', href: anchor('#contact') },
+  { id: 'jump-top', label: '回到顶部', hint: '回到首屏', group: '跳转', href: anchor('#top') },
+  ...site.projects.map((project) => ({
+    id: `project-${project.index}`,
+    label: project.title,
+    hint: project.subtitle,
+    group: '项目',
+    href: project.href || anchor('#work'),
+  })),
+  { id: 'copy-email', label: '复制邮箱', hint: site.email, group: '操作', action: 'copy-email' },
+  { id: 'send-email', label: '发送邮件', hint: site.email, group: '操作', href: `mailto:${site.email}` },
+];
+---
+
+<div class="cmdk" data-cmdk aria-hidden="true">
+  <div class="cmdk__backdrop" data-cmdk-close></div>
+
+  <div class="cmdk__panel" role="dialog" aria-modal="true" aria-label="命令面板">
+    <div class="cmdk__bar">
+      <span class="cmdk__prompt" aria-hidden="true">›</span>
+      <input
+        id="cmdk-input"
+        type="text"
+        role="combobox"
+        aria-expanded="true"
+        aria-controls="cmdk-list"
+        aria-autocomplete="list"
+        placeholder="搜索区块、项目或操作…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <kbd class="cmdk__esc">ESC</kbd>
+    </div>
+
+    <ul class="cmdk__list" id="cmdk-list" role="listbox" aria-label="命令列表" data-cmdk-list></ul>
+
+    <div class="cmdk__foot">
+      <span class="cmdk__status" role="status" aria-live="polite" data-cmdk-status></span>
+      <span class="cmdk__hint">↑↓ 选择 · ↵ 执行</span>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ commands, email: site.email }}>
+  const root = document.querySelector('[data-cmdk]');
+  const input = root?.querySelector('input');
+  const list = root?.querySelector('[data-cmdk-list]');
+  const status = root?.querySelector('[data-cmdk-status]');
+  const panel = root?.querySelector('.cmdk__panel');
+
+  if (root && input && list && status && panel) {
+    let filtered = commands;
+    let active = 0;
+    let lastFocus = null;
+
+    const escapeHtml = (value) =>
+      String(value).replace(/[&<>"']/g, (ch) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      }[ch]));
+
+    const render = (query = '') => {
+      const term = query.trim().toLowerCase();
+      filtered = commands.filter((command) =>
+        `${command.label} ${command.hint} ${command.group}`.toLowerCase().includes(term),
+      );
+      active = 0;
+
+      let previousGroup = '';
+
+      list.innerHTML = filtered
+        .map((command, index) => {
+          const showGroup = command.group !== previousGroup;
+          previousGroup = command.group;
+
+          return `
+            <li
+              class="cmdk__item"
+              role="option"
+              id="cmdk-option-${index}"
+              data-index="${index}"
+              aria-selected="${index === active}"
+            >
+              <span class="cmdk__label">${escapeHtml(command.label)}</span>
+              <span class="cmdk__sub">${escapeHtml(command.hint)}</span>
+              <span class="cmdk__group">${showGroup ? escapeHtml(command.group) : ''}</span>
+            </li>`;
+        })
+        .join('');
+
+      if (!filtered.length) {
+        list.innerHTML = '<li class="cmdk__empty">没有匹配的命令</li>';
+      }
+
+      updateActive();
+    };
+
+    const updateActive = () => {
+      list.querySelectorAll('.cmdk__item').forEach((item, index) => {
+        const selected = index === active;
+        item.classList.toggle('is-active', selected);
+        item.setAttribute('aria-selected', String(selected));
+      });
+      const current = list.querySelector(`[data-index="${active}"]`);
+      current?.scrollIntoView({ block: 'nearest' });
+      input.setAttribute('aria-activedescendant', current ? `cmdk-option-${active}` : '');
+    };
+
+    const close = () => {
+      root.classList.remove('is-open');
+      root.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('cmdk-open');
+      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+      lastFocus = null;
+    };
+
+    const open = () => {
+      // 如果移动端菜单开着，先关掉，避免两层遮罩
+      const toggle = document.querySelector('[data-menu-toggle]');
+      if (document.querySelector('[data-menu]')?.classList.contains('is-open')) {
+        toggle?.click();
+      }
+
+      lastFocus = document.activeElement;
+      root.classList.add('is-open');
+      root.setAttribute('aria-hidden', 'false');
+      document.documentElement.classList.add('cmdk-open');
+      status.textContent = '';
+      input.value = '';
+      render('');
+      requestAnimationFrame(() => input.focus({ preventScroll: true }));
+    };
+
+    const run = (command) => {
+      if (!command) return;
+
+      if (command.action === 'copy-email') {
+        const done = () => {
+          status.textContent = `已复制 ${email}`;
+          window.setTimeout(close, 900);
+        };
+        const fail = () => {
+          status.textContent = '复制失败，请手动选择邮箱';
+        };
+
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(email).then(done).catch(fail);
+        } else {
+          const textarea = document.createElement('textarea');
+          textarea.value = email;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            document.execCommand('copy') ? done() : fail();
+          } catch {
+            fail();
+          }
+          textarea.remove();
+        }
+        return;
+      }
+
+      close();
+      if (!command.href) return;
+
+      const anchor = document.createElement('a');
+      anchor.href = command.href;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    };
+
+    document.querySelectorAll('[data-cmdk-open]').forEach((button) => {
+      button.addEventListener('click', open);
+    });
+
+    root.querySelector('[data-cmdk-close]')?.addEventListener('click', close);
+
+    document.addEventListener('keydown', (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        root.classList.contains('is-open') ? close() : open();
+        return;
+      }
+
+      if (!root.classList.contains('is-open')) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        close();
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        input.focus();
+      }
+    });
+
+    input.addEventListener('input', () => render(input.value));
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        active = Math.min(active + 1, Math.max(filtered.length - 1, 0));
+        updateActive();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        active = Math.max(active - 1, 0);
+        updateActive();
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        run(filtered[active]);
+      }
+    });
+
+    list.addEventListener('click', (event) => {
+      const item = event.target.closest('.cmdk__item');
+      if (!item) return;
+      run(filtered[Number(item.dataset.index)]);
+    });
+
+    list.addEventListener('pointermove', (event) => {
+      const item = event.target.closest('.cmdk__item');
+      if (!item) return;
+      active = Number(item.dataset.index);
+      updateActive();
+    });
+
+    const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+    document.querySelectorAll('[data-kbd-label]').forEach((node) => {
+      node.textContent = isMac ? '⌘K' : 'CTRL K';
+    });
+  }
+</script>
+
+<style is:global>
+  .cmdk {
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    display: grid;
+    place-items: start center;
+    padding-top: 16vh;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease;
+  }
+
+  .cmdk.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .cmdk__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 4, 3, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .cmdk__panel {
+    position: relative;
+    width: min(92vw, 560px);
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #0a0b09;
+    border: 1px solid rgba(241, 241, 234, 0.14);
+    border-radius: 14px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    transform: translateY(-8px) scale(0.99);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cmdk.is-open .cmdk__panel {
+    transform: translateY(0) scale(1);
+  }
+
+  .cmdk__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .cmdk__prompt {
+    color: var(--color-acid);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+  }
+
+  .cmdk__bar input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 0;
+    outline: none;
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    font-size: 0.98rem;
+  }
+
+  .cmdk__bar input::placeholder {
+    color: var(--color-mute);
+  }
+
+  .cmdk__esc {
+    padding: 0.2rem 0.42rem;
+    border: 1px solid var(--color-line);
+    border-radius: 5px;
+    color: var(--color-mute);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+  }
+
+  .cmdk__list {
+    margin: 0;
+    padding: 0.4rem;
+    list-style: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .cmdk__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "label group"
+      "sub group";
+    column-gap: 1rem;
+    padding: 0.65rem 0.8rem;
+    border-radius: 8px;
+    border-left: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .cmdk__item.is-active {
+    background: rgba(201, 255, 61, 0.07);
+    border-left-color: var(--color-acid);
+  }
+
+  .cmdk__label {
+    grid-area: label;
+    font-size: 0.9rem;
+  }
+
+  .cmdk__sub {
+    grid-area: sub;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--color-mute);
+  }
+
+  .cmdk__group {
+    grid-area: group;
+    align-self: center;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mute);
+  }
+
+  .cmdk__item.is-active .cmdk__group {
+    color: var(--color-acid);
+  }
+
+  .cmdk__empty {
+    padding: 1.2rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-mute);
+  }
+
+  .cmdk__foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 1.1rem;
+    border-top: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+    color: var(--color-mute);
+  }
+
+  .cmdk__status {
+    color: var(--color-acid);
+  }
+
+  @media (max-width: 720px) {
+    .cmdk {
+      padding-top: 9vh;
+    }
+
+    .cmdk__panel {
+      max-height: 78vh;
+    }
+
+    .cmdk__foot {
+      font-size: 0.54rem;
+    }
+  }
+</style>

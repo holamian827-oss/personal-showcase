@@ -184,7 +184,9 @@ h3 {
 }
 
 html.menu-open,
-html.menu-open body {
+html.menu-open body,
+html.cmdk-open,
+html.cmdk-open body {
   overflow: hidden;
 }
 
@@ -279,5 +281,161 @@ html.menu-open body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* 打印：去掉装饰，保留可读的简历式排版 */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  body::after,
+  .progress,
+  .cursor,
+  .cmdk,
+  .nav,
+  .menu,
+  .skip-link,
+  .hero__stage,
+  .hero__glow,
+  .hero__spot,
+  .hero::before,
+  .hero::after,
+  .marquee,
+  .hero__scroll,
+  .hero__facts,
+  .hero__copy::before,
+  .hero__actions,
+  .foot__name,
+  .contact__copy,
+  .work__cover,
+  .work__side,
+  .work__arrow {
+    display: none !important;
+  }
+
+  .wrap {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  .section {
+    padding-block: 1.4rem;
+    border-top: 1px solid #ddd;
+    page-break-inside: avoid;
+  }
+
+  .hero {
+    min-height: auto;
+    padding: 0 0 2rem;
+    display: block;
+  }
+
+  .hero__inner {
+    gap: 1rem;
+    padding: 0;
+  }
+
+  .hero__title {
+    font-size: 4rem;
+    color: #111;
+  }
+
+  .eyebrow,
+  .muted,
+  .work__desc,
+  .work__sub,
+  .about__body > p,
+  .contact__bottom p,
+  .foot__bottom,
+  .hero__intro,
+  .hero__en {
+    color: #444 !important;
+  }
+
+  .hero__statement,
+  .section-title,
+  .contact__title {
+    color: #111;
+  }
+
+  .contact__em {
+    color: #111;
+    -webkit-text-stroke: 0;
+  }
+
+  a {
+    color: #111;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  a[href^="http"]::after,
+  a[href^="mailto"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.72em;
+    color: #666;
+  }
+
+  .work__list {
+    border-top: 0;
+  }
+
+  .work__item {
+    border-bottom: 1px solid #ddd;
+  }
+
+  .work__row {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    padding: 0.8rem 0;
+  }
+
+  .work__row:hover {
+    padding-inline: 0;
+  }
+
+  .work__row::before,
+  .work__item::before {
+    display: none;
+  }
+
+  .work__tags li {
+    border-color: #ccc;
+    color: #333;
+  }
+
+  .caps__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .caps__cell {
+    min-height: 0;
+  }
+
+  .caps__cell::after {
+    display: none;
+  }
+
+  .about__intro {
+    position: static;
+  }
+
+  .foot {
+    border-top: 1px solid #ddd;
+    padding-block: 1.2rem;
+  }
+
+  .foot__built {
+    display: none;
+  }
+
+  @page {
+    margin: 14mm;
   }
 }

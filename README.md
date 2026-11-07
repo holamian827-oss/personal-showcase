@@ -6,7 +6,10 @@
 - **3D**：零依赖 WebGL2 + GPU 粒子层（约 5 KB gzip），按设备分级降采样 / 降 DPR，滚出首屏暂停渲染，WebGL 不可用时走内联 SVG 降级
 - **动效**：GSAP + Lenis 单 RAF；`prefers-reduced-motion` 全量降级
 - **样式**：Tailwind CSS v4 + 组件级 scoped CSS
-- **部署**：GitHub Actions → GitHub Pages
+- **部署**：GitHub Actions → GitHub Pages → CloudFront
+- **交互**：⌘K / Ctrl+K 命令面板（跳转、项目、复制邮箱）、移动端菜单、滚动高亮
+- **内容**：每个项目有程序化 SVG 封面；`/rss.xml`、JSON-LD、打印样式
+- **质量**：Lighthouse CI 在每次部署后跑预算检查
 
 ## 本地开发
 

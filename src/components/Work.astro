@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site';
+import ProjectCover from './ProjectCover.astro';
 
 const year = new Date().getFullYear();
 ---
@@ -29,6 +30,10 @@ const year = new Date().getFullYear();
           <li class="work__item" data-reveal>
             <Tag class:list={['work__row', { 'is-static': !project.href }]} {...linkProps}>
               <span class="work__index mono">{project.index}</span>
+
+              <div class="work__cover">
+                <ProjectCover variant={project.cover} title={project.title} />
+              </div>
 
               <div class="work__main">
                 <div class="work__title-row">
@@ -102,7 +107,7 @@ const year = new Date().getFullYear();
   .work__row {
     position: relative;
     display: grid;
-    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    grid-template-columns: 4rem 8.5rem minmax(0, 1fr) auto;
     gap: clamp(1rem, 3vw, 3rem);
     padding: clamp(1.6rem, 4vw, 2.6rem) 0;
     transition: padding 0.4s cubic-bezier(0.65, 0, 0.35, 1);
@@ -143,6 +148,11 @@ const year = new Date().getFullYear();
   .work__row:hover .work__index {
     color: var(--color-acid);
     transform: translateY(-2px);
+  }
+
+  .work__cover {
+    align-self: center;
+    width: 100%;
   }
 
   .work__main {
@@ -236,13 +246,20 @@ const year = new Date().getFullYear();
     color: var(--color-acid);
   }
 
+  @media (max-width: 1100px) {
+    .work__row {
+      grid-template-columns: 3.4rem 7rem minmax(0, 1fr) auto;
+    }
+  }
+
   @media (max-width: 760px) {
     .work__row {
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 0.6rem;
     }
 
-    .work__index {
+    .work__index,
+    .work__cover {
       display: none;
     }
 

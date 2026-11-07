@@ -31,6 +31,7 @@ export const site = {
       index: '01',
       title: 'Reverse APK',
       subtitle: 'Android 逆向技能库',
+      cover: 'graph',
       year: '2026',
       description:
         '把 APK 逆向里重复的动作沉淀成可复用的工作流：侦察、定位、调用链追踪、动态验证，配合 AI 逐步补全。对比过商业工具，这套流程已经能稳定跑通。',
@@ -42,6 +43,7 @@ export const site = {
       index: '02',
       title: 'Eye Detector',
       subtitle: '浏览器端眼部疾病识别',
+      cover: 'iris',
       year: '2026',
       description:
         '把 ONNX 模型放进浏览器：图片不上传、不落盘，本地推理即出结果。静态托管，打开即用。',
@@ -53,6 +55,7 @@ export const site = {
       index: '03',
       title: 'This Site',
       subtitle: '你正在看的这个页面',
+      cover: 'sphere',
       year: '2026',
       description:
         'Astro 静态输出 + 手写 WebGL2 线框球体 + GSAP/Lenis 单 RAF 滚动叙事。零后端，GitHub Pages 直接跑。',

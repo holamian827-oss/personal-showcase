@@ -4,6 +4,7 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Cursor from '../components/Cursor.astro';
+import CommandPalette from '../components/CommandPalette.astro';
 import { site } from '../data/site';
 import { url } from '../lib/url';
 
@@ -20,20 +21,62 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const rootUrl = new URL(url('/'), Astro.site).href;
 const ogImage = new URL(url('/og.png'), Astro.site).href;
 const socialUrls = site.socials
   .map((s) => s.href)
   .filter((href) => href.startsWith('http'));
 
-const personLd = {
+const personId = `${rootUrl}#person`;
+const websiteId = `${rootUrl}#website`;
+
+const structuredData = {
   '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: site.name,
-  alternateName: site.nameEn,
-  jobTitle: site.role,
-  url: canonical,
-  email: `mailto:${site.email}`,
-  sameAs: socialUrls,
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': personId,
+      name: site.name,
+      alternateName: site.nameEn,
+      jobTitle: site.role,
+      url: canonical,
+      email: `mailto:${site.email}`,
+      ...(socialUrls.length ? { sameAs: socialUrls } : {}),
+    },
+    {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      name: site.name,
+      url: rootUrl,
+      description: site.intro,
+      inLanguage: 'zh-CN',
+      publisher: { '@id': personId },
+    },
+    {
+      '@type': 'CollectionPage',
+      '@id': `${canonical}#page`,
+      name: title,
+      url: canonical,
+      isPartOf: { '@id': websiteId },
+      about: { '@id': personId },
+      mainEntity: {
+        '@type': 'ItemList',
+        numberOfItems: site.projects.length,
+        itemListElement: site.projects.map((project, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'CreativeWork',
+            name: project.title,
+            description: project.description,
+            url: project.href || canonical,
+            keywords: project.tags.join(', '),
+            dateCreated: `${project.year}-01-01`,
+          },
+        })),
+      },
+    },
+  ],
 };
 ---
 
@@ -46,6 +89,12 @@ const personLd = {
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${site.name} · 作品`}
+      href={url('/rss.xml')}
+    />
     <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
     <link rel="icon" href={url('/favicon.ico')} sizes="64x64" />
     <meta name="theme-color" content="#050607" />
@@ -60,6 +109,7 @@ const personLd = {
     <meta property="og:locale" content="zh_CN" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={`${site.name} — ${site.role}`} />
@@ -68,16 +118,18 @@ const personLd = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={`${site.name} — ${site.role}`} />
 
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
-    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
     <div class="progress" data-progress aria-hidden="true"></div>
     <a class="skip-link" href="#main">跳到主要内容</a>
     <Cursor />
+    <CommandPalette />
     <Nav />
     <main id="main">
       <slot />
