@@ -3,7 +3,7 @@
 一个零后端的静态个人站。首屏是**手写 WebGL2** 实时渲染的线框球体（没有 three.js / React），滚动叙事由 GSAP ScrollTrigger + Lenis 共用一条 RAF 完成。
 
 - **框架**：Astro 7（静态输出，默认零 JS，仅首屏 3D 岛水合）
-- **3D**：零依赖 WebGL2（约 3 KB gzip），按设备分级降采样 / 降 DPR，滚出首屏暂停渲染，WebGL 不可用时走内联 SVG 降级
+- **3D**：零依赖 WebGL2 + GPU 粒子层（约 5 KB gzip），按设备分级降采样 / 降 DPR，滚出首屏暂停渲染，WebGL 不可用时走内联 SVG 降级
 - **动效**：GSAP + Lenis 单 RAF；`prefers-reduced-motion` 全量降级
 - **样式**：Tailwind CSS v4 + 组件级 scoped CSS
 - **部署**：GitHub Actions → GitHub Pages
@@ -91,7 +91,7 @@ src/
 
 ## 性能备注
 
-- 首屏球体只有约 3 KB gzip：零 three.js / React，一个 shader program、3 次 draw call；滚出视口自动停渲染，DPR 上限 1.5。
+- 首屏球体只有约 3 KB gzip：零 three.js / React，两个 shader program、4 次 draw call（线框 + 点云 + 轨道 + 1.2 万粒子）；滚出视口自动停渲染，DPR 上限 1.5。
 - 全站 JS 约 54 KB gzip（GSAP 27 + 动效 23 + 球体 3 + 光标 0.5），CSS 约 9 KB gzip。
 - 球体加载前由内联 SVG 线框球占位，WebGL2 不可用时直接保留它，不会出现空白。
 - 字体内置于 npm 包（`@fontsource-variable/space-grotesk`），不依赖 Google Fonts，国内访问稳定。

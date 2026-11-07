@@ -183,7 +183,7 @@ void main() {
   gl_Position = uProj * mv;
   gl_PointSize = uPointSize * (0.55 + aSeed * 0.9) / max(-mv.z, 0.1);
 
-  vAlpha = 0.16 + aSeed * 0.34;
+  vAlpha = 0.2 + aSeed * 0.42;
   vMix = step(0.84, aSeed);
 }
 `;
@@ -299,6 +299,34 @@ export function mountSphere(canvas: HTMLCanvasElement): (() => void) | null {
   };
   const aPos = gl.getAttribLocation(program, 'aPos');
 
+  // ---- 粒子层：独立的轻量 program，一次 draw call ----
+  const pVertex = compile(gl.VERTEX_SHADER, PARTICLE_VERT);
+  const pFragment = compile(gl.FRAGMENT_SHADER, PARTICLE_FRAG);
+  if (!pVertex || !pFragment) return null;
+
+  const particleProgram = gl.createProgram();
+  if (!particleProgram) return null;
+  gl.attachShader(particleProgram, pVertex);
+  gl.attachShader(particleProgram, pFragment);
+  gl.linkProgram(particleProgram);
+  if (!gl.getProgramParameter(particleProgram, gl.LINK_STATUS)) {
+    console.error(gl.getProgramInfoLog(particleProgram));
+    return null;
+  }
+
+  const particleUniforms = {
+    proj: gl.getUniformLocation(particleProgram, 'uProj'),
+    time: gl.getUniformLocation(particleProgram, 'uTime'),
+    mouse: gl.getUniformLocation(particleProgram, 'uMouse'),
+    pointSize: gl.getUniformLocation(particleProgram, 'uPointSize'),
+    scroll: gl.getUniformLocation(particleProgram, 'uScroll'),
+  };
+  const particleAttribs = {
+    dir: gl.getAttribLocation(particleProgram, 'aDir'),
+    seed: gl.getAttribLocation(particleProgram, 'aSeed'),
+    radius: gl.getAttribLocation(particleProgram, 'aRadius'),
+  };
+
   const { verts, edges } = icosahedron(level);
   const positions = new Float32Array(verts.length * 3);
   verts.forEach((v, i) => {
@@ -325,6 +353,8 @@ export function mountSphere(canvas: HTMLCanvasElement): (() => void) | null {
   const pointBuffer = createBuffer(fibonacciPoints(pointCount));
   const ringBuffer = createBuffer(ringPoints(180));
   const satelliteBuffer = createBuffer(new Float32Array([0, 0, 0]));
+  const particleCount = quality === 'high' ? 12000 : 4500;
+  const particleBuffer = createBuffer(particleField(particleCount));
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -402,6 +432,36 @@ export function mountSphere(canvas: HTMLCanvasElement): (() => void) | null {
 
     const ringRotX = 1.15 + Math.sin(t * 0.25) * 0.08;
     const ringRotZ = 0.2 + t * 0.06;
+
+    // 粒子层先画，视觉上在球体后面
+    gl.useProgram(particleProgram);
+    gl.uniformMatrix4fv(particleUniforms.proj, false, proj);
+    gl.uniform1f(particleUniforms.time, t);
+    gl.uniform2f(particleUniforms.mouse, mouse.x, mouse.y);
+    gl.uniform1f(
+      particleUniforms.pointSize,
+      (quality === 'high' ? 1.45 : 1.8) * dpr * 4.7,
+    );
+    gl.uniform1f(particleUniforms.scroll, scroll);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, particleBuffer);
+    gl.enableVertexAttribArray(particleAttribs.dir);
+    gl.vertexAttribPointer(particleAttribs.dir, 3, gl.FLOAT, false, 20, 0);
+    gl.enableVertexAttribArray(particleAttribs.seed);
+    gl.vertexAttribPointer(particleAttribs.seed, 1, gl.FLOAT, false, 20, 12);
+    gl.enableVertexAttribArray(particleAttribs.radius);
+    gl.vertexAttribPointer(particleAttribs.radius, 1, gl.FLOAT, false, 20, 16);
+
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    gl.drawArrays(gl.POINTS, 0, particleCount);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    gl.disableVertexAttribArray(particleAttribs.dir);
+    gl.disableVertexAttribArray(particleAttribs.seed);
+    gl.disableVertexAttribArray(particleAttribs.radius);
+
+    gl.useProgram(program);
+    gl.uniformMatrix4fv(uniforms.proj, false, proj);
 
     draw(
       ringBuffer,
@@ -513,8 +573,12 @@ export function mountSphere(canvas: HTMLCanvasElement): (() => void) | null {
     gl.deleteBuffer(pointBuffer);
     gl.deleteBuffer(ringBuffer);
     gl.deleteBuffer(satelliteBuffer);
+    gl.deleteBuffer(particleBuffer);
     gl.deleteProgram(program);
+    gl.deleteProgram(particleProgram);
     gl.deleteShader(vs);
     gl.deleteShader(fs);
+    gl.deleteShader(pVertex);
+    gl.deleteShader(pFragment);
   };
 }
