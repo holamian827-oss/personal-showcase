@@ -97,8 +97,8 @@ src/
 前端代码最终一定会下发到浏览器，混淆只能提高复制成本，不能真正保密。本项目生产构建启用了较重的保护：
 
 - 只处理自有脚本（SphereGL / Base / Cursor / Nav / Contact），跳过 GSAP 等第三方
-- 开启：标识符重命名、RC4 字符串数组、控制流扁平化（0.5）、死代码注入（0.2）、debugProtection（每 2 秒）
-- 关闭：selfDefending（实测会破坏加载）
+- 开启：标识符重命名、RC4 字符串数组、控制流扁平化（0.5）、死代码注入（0.2）
+- 关闭：selfDefending（实测会破坏加载）、debugProtection（会让 Lighthouse / DevTools 挂起）
 - 粒子分布核心用 **AssemblyScript 编译成 WASM**（`sphere-core.wasm`），JS 侧只剩缓冲区和 WebGL 调用，加载失败自动回退 JS 版本
 - 在 `renderChunk` 阶段执行，文件名 hash 与最终内容一致，**CloudFront / 浏览器缓存不会错版本**
 
