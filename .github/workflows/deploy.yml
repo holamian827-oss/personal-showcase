@@ -45,6 +45,9 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+        env:
+          # 生产构建启用轻量混淆；renderChunk 阶段执行，hash 仍然正确
+          OBFUSCATE: '1'
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -89,6 +89,21 @@ src/
 .github/workflows/deploy.yml
 ```
 
+## 代码保护
+
+前端代码最终一定会下发到浏览器，混淆只能提高复制成本，不能真正保密。本项目在**生产构建**里做轻量混淆：
+
+- 只处理自有脚本（SphereGL / Base / Cursor / Nav / Contact），跳过 GSAP 等第三方
+- 开启：标识符重命名、字符串数组
+- 关闭：控制流扁平化、死代码注入、selfDefending、debugProtection（这些会明显拖慢或破坏运行）
+- 在 `renderChunk` 阶段执行，文件名 hash 与最终内容一致，**CloudFront / 浏览器缓存不会错版本**
+
+```bash
+npm run build:protect   # 本地体验生产混淆
+```
+
+CI 里通过 `OBFUSCATE=1` 自动启用。仓库本身是公开的，如果目标是隐藏源码，需要把仓库转私有并更换托管（GitHub Pages 免费版不支持私有仓库）。
+
 ## 性能备注
 
 - 首屏球体 + 粒子层约 5 KB gzip：零 three.js / React，两个 shader program、4 次 draw call（线框 + 点云 + 轨道 + 1.2 万粒子）；滚出视口自动停渲染，DPR 上限 1.5。
