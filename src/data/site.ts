@@ -55,8 +55,8 @@ export const site = {
       subtitle: '你正在看的这个页面',
       year: '2026',
       description:
-        'Astro 静态输出 + React Three Fiber 线框球体 + GSAP/Lenis 单 RAF 滚动叙事。零后端，GitHub Pages 直接跑。',
-      tags: ['Astro', 'React Three Fiber', 'GSAP'],
+        'Astro 静态输出 + 手写 WebGL2 线框球体 + GSAP/Lenis 单 RAF 滚动叙事。零后端，GitHub Pages 直接跑。',
+      tags: ['Astro', 'WebGL2', 'GSAP'],
       href: '',
       linkLabel: '看源码',
     },
@@ -66,7 +66,7 @@ export const site = {
     {
       title: '前端',
       note: 'Frontend',
-      items: ['Astro', 'React / TypeScript', 'Tailwind CSS', 'Three.js / R3F', 'GSAP / Lenis'],
+      items: ['Astro', 'TypeScript', 'Tailwind CSS', 'WebGL2 / GLSL', 'GSAP / Lenis'],
     },
     {
       title: '后端与基础设施',

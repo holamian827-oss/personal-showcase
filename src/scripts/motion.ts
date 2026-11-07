@@ -76,6 +76,41 @@ if (!reduced) {
   });
 }
 
+/* 首屏跟随鼠标的柔光（桌面端） */
+if (!reduced && finePointer) {
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const spot = hero?.querySelector<HTMLElement>('[data-spot]');
+
+  if (hero && spot) {
+    let raf = 0;
+
+    window.addEventListener(
+      'pointermove',
+      (event) => {
+        if (raf) return;
+        const { clientX, clientY } = event;
+
+        raf = requestAnimationFrame(() => {
+          const rect = hero.getBoundingClientRect();
+          const x = clientX - rect.left;
+          const y = clientY - rect.top;
+
+          if (y >= 0 && y <= rect.height) {
+            hero.style.setProperty('--mx', `${x}px`);
+            hero.style.setProperty('--my', `${y}px`);
+            spot.classList.add('is-on');
+          } else {
+            spot.classList.remove('is-on');
+          }
+
+          raf = 0;
+        });
+      },
+      { passive: true },
+    );
+  }
+}
+
 /* 磁吸：只给主按钮一点点“手感”，桌面端生效 */
 if (!reduced && finePointer) {
   document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach((el) => {

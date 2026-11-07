@@ -67,8 +67,13 @@ const links = [
     transition:
       background 0.35s ease,
       border-color 0.35s ease,
-      padding 0.35s ease;
+      padding 0.35s ease,
+      transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
     border-bottom: 1px solid transparent;
+  }
+
+  .nav.is-hidden {
+    transform: translateY(-105%);
   }
 
   .nav.is-scrolled {
@@ -325,7 +330,25 @@ const links = [
   const menu = document.querySelector<HTMLElement>('[data-menu]');
 
   if (nav) {
-    const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 24);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let lastY = window.scrollY;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      nav.classList.toggle('is-scrolled', y > 24);
+
+      const menuOpen = document.querySelector('[data-menu]')?.classList.contains('is-open');
+
+      // 向下滚隐藏导航，向上滚立刻回来
+      if (!reduced && !menuOpen && y > 320 && y > lastY + 6) {
+        nav.classList.add('is-hidden');
+      } else if (y < lastY - 6) {
+        nav.classList.remove('is-hidden');
+      }
+
+      lastY = y;
+    };
+
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
   }

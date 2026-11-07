@@ -1,0 +1,23 @@
+<div class="sphere-gl" data-sphere-gl aria-hidden="true">
+  <canvas data-sphere-canvas></canvas>
+</div>
+
+<script>
+  import { mountSphere } from '../scripts/sphere-gl';
+
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-sphere-canvas]');
+  if (canvas) mountSphere(canvas);
+</script>
+
+<style>
+  .sphere-gl {
+    position: absolute;
+    inset: 0;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

@@ -1,9 +1,9 @@
 # 李嘉宏 · 个人站
 
-一个零后端的静态个人站。首屏是 React Three Fiber 实时渲染的线框球体，滚动叙事由 GSAP ScrollTrigger + Lenis 共用一条 RAF 完成。
+一个零后端的静态个人站。首屏是**手写 WebGL2** 实时渲染的线框球体（没有 three.js / React），滚动叙事由 GSAP ScrollTrigger + Lenis 共用一条 RAF 完成。
 
 - **框架**：Astro 7（静态输出，默认零 JS，仅首屏 3D 岛水合）
-- **3D**：Three.js + React Three Fiber，按设备分级降采样 / 降 DPR，WebGL 不可用时走 CSS 降级
+- **3D**：零依赖 WebGL2（约 3 KB gzip），按设备分级降采样 / 降 DPR，滚出首屏暂停渲染，WebGL 不可用时走内联 SVG 降级
 - **动效**：GSAP + Lenis 单 RAF；`prefers-reduced-motion` 全量降级
 - **样式**：Tailwind CSS v4 + 组件级 scoped CSS
 - **部署**：GitHub Actions → GitHub Pages
@@ -81,8 +81,9 @@ src/
   layouts/Base.astro     # SEO / OG / JSON-LD / 全局脚本
   components/
     Hero.astro           # 首屏排版
-    three/SphereScene.tsx# 线框球体（含设备分级与降级）
+    SphereGL.astro       # WebGL2 画布容器
     Work / About / Capabilities / Contact / Marquee / Nav / Footer / Cursor
+  scripts/sphere-gl.ts   # 线框球体：几何、shader、分级与降级
   scripts/motion.ts      # Lenis + GSAP + 滚动揭示 + 阅读进度
   styles/global.css      # 设计令牌与基础样式
 .github/workflows/deploy.yml
@@ -90,6 +91,8 @@ src/
 
 ## 性能备注
 
-- 3D 与 React 运行时是独立 chunk（约 1.1 MB 未压缩 / ~300 KB gzip），首屏直接水合；水合前由同构的内联 SVG 线框球占位，不会出现空白。想更极致可以延迟挂载或改手写 WebGL。
+- 首屏球体只有约 3 KB gzip：零 three.js / React，一个 shader program、3 次 draw call；滚出视口自动停渲染，DPR 上限 1.5。
+- 全站 JS 约 54 KB gzip（GSAP 27 + 动效 23 + 球体 3 + 光标 0.5），CSS 约 9 KB gzip。
+- 球体加载前由内联 SVG 线框球占位，WebGL2 不可用时直接保留它，不会出现空白。
 - 字体内置于 npm 包（`@fontsource-variable/space-grotesk`），不依赖 Google Fonts，国内访问稳定。
 - 全站无 Cookie、无第三方分析脚本；需要统计时建议接 Umami 或 Plausible。

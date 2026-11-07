@@ -76,7 +76,27 @@ const year = new Date().getFullYear();
   }
 
   .work__item {
+    position: relative;
     border-bottom: 1px solid var(--color-line);
+  }
+
+  /* hover 时从左侧长出一条酸绿细线 */
+  .work__item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--color-acid), transparent);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  .work__item:hover::before {
+    transform: scaleY(1);
   }
 
   .work__row {
@@ -102,11 +122,11 @@ const year = new Date().getFullYear();
     pointer-events: none;
   }
 
-  .work__row:not(.is-static):hover {
+  .work__row:hover {
     padding-inline: 0.9rem;
   }
 
-  .work__row:not(.is-static):hover::before {
+  .work__row:hover::before {
     opacity: 1;
     transform: scaleX(1);
   }
@@ -120,7 +140,7 @@ const year = new Date().getFullYear();
       transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .work__row:not(.is-static):hover .work__index {
+  .work__row:hover .work__index {
     color: var(--color-acid);
     transform: translateY(-2px);
   }
@@ -145,7 +165,7 @@ const year = new Date().getFullYear();
     transition: color 0.3s ease;
   }
 
-  .work__row:not(.is-static):hover h3 {
+  .work__row:hover h3 {
     color: var(--color-acid);
   }
 
@@ -161,6 +181,11 @@ const year = new Date().getFullYear();
     color: var(--color-mute);
     font-size: 0.9rem;
     line-height: 1.7;
+    transition: color 0.35s ease;
+  }
+
+  .work__row:hover .work__desc {
+    color: #a6aaa1;
   }
 
   .work__tags {
@@ -180,6 +205,14 @@ const year = new Date().getFullYear();
     border: 1px solid var(--color-line);
     border-radius: 999px;
     padding: 0.22rem 0.6rem;
+    transition:
+      border-color 0.35s ease,
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .work__row:hover .work__tags li {
+    border-color: rgba(201, 255, 61, 0.28);
+    transform: translateY(-1px);
   }
 
   .work__side {
@@ -198,7 +231,7 @@ const year = new Date().getFullYear();
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .work__row:not(.is-static):hover .work__arrow {
+  .work__row:hover .work__arrow {
     transform: translate(4px, -4px);
     color: var(--color-acid);
   }
