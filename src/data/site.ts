@@ -29,13 +29,13 @@ export const site = {
   projects: [
     {
       index: '01',
-      title: 'Cloud Mail',
-      subtitle: 'Workers 原生邮件服务',
+      title: 'Reverse APK',
+      subtitle: 'Android 逆向技能库',
       year: '2026',
       description:
-        '基于 Cloudflare Workers 的邮件收发服务。重做磨砂玻璃界面，修复阻塞性缺陷，并在免费版 CPU 预算内完成安全加固。',
-      tags: ['Cloudflare Workers', 'UI 重构', '安全加固'],
-      href: '',
+        '把 APK 逆向里重复的动作沉淀成可复用的工作流：侦察、定位、调用链追踪、动态验证，配合 AI 逐步补全。对比过商业工具，这套流程已经能稳定跑通。',
+      tags: ['Android', 'APK 逆向', 'AI 辅助'],
+      href: 'https://github.com/holamian827-oss/reverse-apk_skill',
       linkLabel: '查看项目',
     },
     {
@@ -86,7 +86,7 @@ export const site = {
   ],
 
   now: [
-    { label: '正在做', text: 'Cloud Mail 的界面与安全收口' },
+    { label: '正在做', text: 'Android 逆向工作流的持续打磨' },
     { label: '正在学', text: 'WebGL 着色器与实时渲染性能' },
     { label: '正在找', text: '有趣的远程合作与安全项目' },
   ],

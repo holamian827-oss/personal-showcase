@@ -148,6 +148,85 @@ void main() {
 }
 `;
 
+const PARTICLE_VERT = `#version 300 es
+precision highp float;
+
+in vec3 aDir;
+in float aSeed;
+in float aRadius;
+
+uniform mat4 uProj;
+uniform float uTime;
+uniform vec2 uMouse;
+uniform float uPointSize;
+uniform float uScroll;
+
+out float vAlpha;
+out float vMix;
+
+vec3 rotY(vec3 p, float a) {
+  float c = cos(a), s = sin(a);
+  return vec3(c * p.x + s * p.z, p.y, -s * p.x + c * p.z);
+}
+
+void main() {
+  float spin = uTime * (0.06 + aSeed * 0.1);
+  vec3 d = rotY(aDir, spin);
+  float wobble = sin(uTime * 0.5 + aSeed * 30.0) * 0.05;
+  float r = aRadius + wobble - uScroll * 0.25;
+  vec3 p = d * r;
+
+  p.x += uMouse.x * 0.18 * (aRadius - 1.5);
+  p.y += uMouse.y * 0.12 * (aRadius - 1.5);
+
+  vec4 mv = vec4(p, 1.0) + vec4(0.0, 0.0, -4.7, 0.0);
+  gl_Position = uProj * mv;
+  gl_PointSize = uPointSize * (0.55 + aSeed * 0.9) / max(-mv.z, 0.1);
+
+  vAlpha = 0.16 + aSeed * 0.34;
+  vMix = step(0.84, aSeed);
+}
+`;
+
+const PARTICLE_FRAG = `#version 300 es
+precision highp float;
+
+in float vAlpha;
+in float vMix;
+out vec4 outColor;
+
+void main() {
+  vec2 c = gl_PointCoord - 0.5;
+  float d = length(c);
+  if (d > 0.5) discard;
+
+  float a = smoothstep(0.5, 0.0, d) * vAlpha;
+  vec3 col = mix(vec3(0.945, 0.945, 0.918), vec3(0.788, 1.0, 0.239), vMix);
+  outColor = vec4(col, a);
+}
+`;
+
+function particleField(count: number) {
+  const data = new Float32Array(count * 5);
+  for (let i = 0; i < count; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const dir = normalize([
+      Math.sin(phi) * Math.cos(theta),
+      Math.sin(phi) * Math.sin(theta),
+      Math.cos(phi),
+    ]);
+    const seed = Math.random();
+    const radius = 1.65 + Math.pow(Math.random(), 1.6) * 0.95;
+    data[i * 5] = dir[0];
+    data[i * 5 + 1] = dir[1];
+    data[i * 5 + 2] = dir[2];
+    data[i * 5 + 3] = seed;
+    data[i * 5 + 4] = radius;
+  }
+  return data;
+}
+
 function perspective(aspect: number, fovDeg = 42, near = 0.1, far = 30) {
   const f = 1 / Math.tan((fovDeg * Math.PI) / 360);
   return new Float32Array([
