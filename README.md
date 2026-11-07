@@ -91,8 +91,8 @@ src/
 
 ## 性能备注
 
-- 首屏球体只有约 3 KB gzip：零 three.js / React，两个 shader program、4 次 draw call（线框 + 点云 + 轨道 + 1.2 万粒子）；滚出视口自动停渲染，DPR 上限 1.5。
-- 全站 JS 约 54 KB gzip（GSAP 27 + 动效 23 + 球体 3 + 光标 0.5），CSS 约 9 KB gzip。
+- 首屏球体 + 粒子层约 5 KB gzip：零 three.js / React，两个 shader program、4 次 draw call（线框 + 点云 + 轨道 + 1.2 万粒子）；滚出视口自动停渲染，DPR 上限 1.5。
+- 全站 JS 约 56 KB gzip（GSAP 27 + 动效 23 + 球体 5 + 光标 0.5），CSS 约 9 KB gzip。
 - 球体加载前由内联 SVG 线框球占位，WebGL2 不可用时直接保留它，不会出现空白。
 - 字体内置于 npm 包（`@fontsource-variable/space-grotesk`），不依赖 Google Fonts，国内访问稳定。
 - 全站无 Cookie、无第三方分析脚本；需要统计时建议接 Umami 或 Plausible。
