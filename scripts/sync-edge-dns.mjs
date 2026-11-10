@@ -231,10 +231,40 @@ async function main() {
       return best;
     };
 
+    // 校验 CloudFront 返回的 x-amz-cf-pop，防止海外 runner 把美国 IP 当成香港
+    const POP_PREFIX = {
+      hk: ['HKG'],
+      sg: ['SIN'],
+      jp: ['NRT', 'KIX'],
+      kr: ['ICN'],
+      tw: ['TPE'],
+      mo: ['HKG'],
+      cn: ['HKG'],
+      vn: ['HAN', 'SGN', 'SIN'],
+      extra: [],
+    };
+
+    const regionOk = (item) => {
+      for (const region of item.regions.split(',')) {
+        const prefixes = POP_PREFIX[region];
+        if (!prefixes || !prefixes.length) continue;
+        if (prefixes.some((prefix) => item.pop.startsWith(prefix))) return true;
+      }
+      return false;
+    };
+
     selected = measured
-      .filter((item) => item.status >= 200 && item.status < 400)
+      .filter((item) => item.status >= 200 && item.status < 400 && regionOk(item))
       .sort((a, b) => rank(a) - rank(b) || a.ttfb - b.ttfb)
       .slice(0, COUNT);
+
+    // 兜底：使用内置种子，避免 pop 校验把全部候选过滤掉
+    if (!selected.length) {
+      const known = new Set(REGIONS.flatMap((region) => KNOWN_IPS[region] || []));
+      selected = measured
+        .filter((item) => known.has(item.ip) && item.status >= 200 && item.status < 400)
+        .slice(0, COUNT);
+    }
   } else {
     selected = measured
       .filter((item) => item.ok)
