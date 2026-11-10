@@ -31,6 +31,7 @@ const REGIONS = (process.env.EDGE_REGIONS || 'hk,sg,vn,jp,kr,tw,cn,mo')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
+const IP_SOURCE = process.env.EDGE_IP_SOURCE || '';
 const EXTRA_IPS = (process.env.EXTRA_EDGE_IPS || '')
   .split(',')
   .map((s) => s.trim())
@@ -164,6 +165,23 @@ async function discover() {
   for (const ip of EXTRA_IPS) {
     if (!found.has(ip)) found.set(ip, new Set());
     found.get(ip).add('extra');
+  }
+
+  // 可选：从社区“CloudFront 优选 IP”页面/文本拉取候选
+  if (IP_SOURCE) {
+    try {
+      const text = execFileSync('curl', ['-s', '--max-time', '20', IP_SOURCE], {
+        encoding: 'utf8',
+      });
+      const matches = [...new Set(text.match(/(?:\d{1,3}\.){3}\d{1,3}/g) || [])].slice(0, 24);
+      for (const ip of matches) {
+        if (!found.has(ip)) found.set(ip, new Set());
+        found.get(ip).add('extra');
+      }
+      console.log(`  优选源 ${IP_SOURCE} -> ${matches.length} 个候选`);
+    } catch {
+      console.log(`  优选源 ${IP_SOURCE} -> 拉取失败`);
+    }
   }
 
   return found;
