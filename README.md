@@ -130,7 +130,7 @@ npm run dns:apply    # 测速并替换 Cloudflare 上 @ 的 A/AAAA/CNAME
    - Variable：`CF_ZONE_ID`（域名 Overview 右下角）
 3. Actions → **Sync edge DNS** → Run workflow
 
-GitHub runner 在海外，`--region-mode` **不做本地延迟排名**，只按「香港优先，然后新加坡」+ 健康检查选最多 10 个。要按中国网络真实测速优选，还是在本地跑 `npm run dns:apply`。
+GitHub runner 在海外，`--region-mode` **不做本地延迟排名**。默认只维护 4 条香港记录（你这里实测最快）；想混入新加坡，把 workflow 里的 `EDGE_REGIONS` 改成 `hk,sg`、`EDGE_COUNT` 改成 10，但静态 A 记录会让客户端随机选中，可能反而变慢。要按中国网络真实测速优选，还是在本地跑 `npm run dns:apply`。
 
 ## 代码保护
 

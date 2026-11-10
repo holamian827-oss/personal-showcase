@@ -36,5 +36,5 @@ jobs:
         env:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ZONE_ID: ${{ vars.CF_ZONE_ID }}
-          EDGE_REGIONS: hk,sg
-          EDGE_COUNT: '10'
+          EDGE_REGIONS: hk
+          EDGE_COUNT: '4'
