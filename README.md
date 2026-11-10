@@ -92,6 +92,28 @@ src/
 .github/workflows/deploy.yml
 ```
 
+## 自动同步边缘 IP
+
+裸域 `173682.xyz` 用 A 记录直连 CloudFront，绕过 Cloudflare 的 apex CNAME flattening（否则部分解析器会拿到新加坡/美国边缘）。
+
+```bash
+npm run dns:sync     # 只发现 + 测速，不改 DNS
+npm run dns:apply    # 测速并替换 Cloudflare 上 @ 的 A/AAAA/CNAME
+```
+
+需要的环境变量：
+
+| 变量 | 说明 |
+|---|---|
+| `CF_API_TOKEN` | Cloudflare Token，权限 Zone.DNS Edit（按域名查 zone 再加 Zone.Zone Read） |
+| `CF_ZONE_ID` | 可选；不填则用 token 按域名查询 |
+| `EXTRA_EDGE_IPS` | 可选，逗号分隔的额外候选 IP（例如你在 ITDog 测到很快的 IP） |
+| `EDGE_MAX_MS` | 延迟阈值，默认 60ms |
+
+脚本会查询香港、新加坡、越南、日本、韩国、台湾、大陆方向的 CloudFront 边缘，本地测 TLS + TTFB，取最快的前 10 个（不足 10 个就全用），然后只替换裸域记录；`www` 不动。
+
+注意：CloudFront 对亚洲方向目前只给出香港 `3.175.214.x`（10–15ms）和马尼拉 `3.170.249.x`（80ms+），没有独立的新加坡/越南 IP。默认 60ms 阈值只会保留香港；想要马尼拉作为兜底可以设 `EDGE_MAX_MS=200`。建议在本地（澳门/中国网络）跑，GitHub 美国 runner 的测速结果不适用。
+
 ## 代码保护
 
 前端代码最终一定会下发到浏览器，混淆只能提高复制成本，不能真正保密。本项目生产构建启用了较重的保护：

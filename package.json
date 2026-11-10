@@ -8,7 +8,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "build:protect": "cross-env OBFUSCATE=1 astro build",
-    "wasm:build": "asc src/wasm/sphere-core.ts -o src/wasm/sphere-core.wasm --optimize --exportRuntime --target release"
+    "wasm:build": "asc src/wasm/sphere-core.ts -o src/wasm/sphere-core.wasm --optimize --exportRuntime --target release",
+    "dns:sync": "node scripts/sync-edge-dns.mjs",
+    "dns:apply": "node scripts/sync-edge-dns.mjs --apply"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
