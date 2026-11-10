@@ -35,6 +35,19 @@ const EXTRA_IPS = (process.env.EXTRA_EDGE_IPS || '')
   .map((s) => s.trim())
   .filter(Boolean);
 
+const KNOWN_IPS = {
+  hk: ['3.175.214.14', '3.175.214.45', '3.175.214.81', '3.175.214.87'],
+  sg: [
+    '13.35.35.7',
+    '13.35.35.90',
+    '13.35.202.85',
+    '13.35.202.13',
+    '13.35.227.191',
+    '13.35.37.29',
+  ],
+  jp: ['13.32.50.1'],
+};
+
 const SUBNETS = {
   hk: ['1.36.0.0/16', '203.198.0.0/16', '210.6.0.0/16', '218.102.0.0/16'],
   sg: ['165.21.0.0/16', '118.189.0.0/16', '203.116.0.0/16', '175.156.0.0/16', '118.200.0.0/16'],
@@ -112,6 +125,11 @@ async function discover() {
   const found = new Map();
 
   for (const region of REGIONS) {
+    for (const ip of KNOWN_IPS[region] || []) {
+      if (!found.has(ip)) found.set(ip, new Set());
+      found.get(ip).add(region);
+    }
+
     for (const subnet of SUBNETS[region] || []) {
       const url = `https://dns.google/resolve?name=${CF_DOMAIN}&type=A&edns_client_subnet=${subnet}`;
       try {
