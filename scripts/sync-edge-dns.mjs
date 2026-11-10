@@ -26,6 +26,7 @@ const ZONE_ID = process.env.CF_ZONE_ID || '';
 const COUNT = Number(process.env.EDGE_COUNT || 10);
 const MAX_MS = Number(process.env.EDGE_MAX_MS || 60);
 const APPLY = process.argv.includes('--apply');
+const REGION_MODE = process.argv.includes('--region-mode') || process.env.EDGE_REGION_MODE === '1';
 const REGIONS = (process.env.EDGE_REGIONS || 'hk,sg,vn,jp,kr,tw,cn,mo')
   .split(',')
   .map((s) => s.trim())
@@ -44,6 +45,7 @@ const KNOWN_IPS = {
     '13.35.202.13',
     '13.35.227.191',
     '13.35.37.29',
+    '65.9.168.121',
   ],
   jp: ['13.32.50.1'],
 };
@@ -215,10 +217,30 @@ async function main() {
     );
   }
 
-  const selected = measured
-    .filter((item) => item.ok)
-    .sort((a, b) => a.ttfb - b.ttfb)
-    .slice(0, COUNT);
+  let selected;
+
+  if (REGION_MODE) {
+    // GitHub 等海外机器测不出中国真实延迟：按区域优先级选，只做健康检查
+    const priority = ['hk', 'sg', 'jp', 'kr', 'tw', 'mo', 'cn', 'vn', 'extra'];
+    const rank = (item) => {
+      let best = 99;
+      for (const region of item.regions.split(',')) {
+        const index = priority.indexOf(region);
+        if (index >= 0) best = Math.min(best, index);
+      }
+      return best;
+    };
+
+    selected = measured
+      .filter((item) => item.status >= 200 && item.status < 400)
+      .sort((a, b) => rank(a) - rank(b) || a.ttfb - b.ttfb)
+      .slice(0, COUNT);
+  } else {
+    selected = measured
+      .filter((item) => item.ok)
+      .sort((a, b) => a.ttfb - b.ttfb)
+      .slice(0, COUNT);
+  }
 
   if (!selected.length) {
     console.error(`没有 IP 满足 ${MAX_MS}ms 阈值`);

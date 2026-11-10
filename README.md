@@ -120,6 +120,18 @@ npm run dns:apply    # 测速并替换 Cloudflare 上 @ 的 A/AAAA/CNAME
 
 默认 60ms 阈值会选中 **4 条香港 + 6 条新加坡，共 10 条**；东京和马尼拉（80ms+）会被排除。只想保留香港可以把 `EDGE_MAX_MS` 设为 30。CloudFront 的 IP 会变化，脚本每次都会重新发现并测速。建议在本地（澳门/中国网络）运行，GitHub 美国 runner 的测速结果不适用。
 
+### GitHub Action
+
+`.github/workflows/edge-dns.yml` 每 6 小时检查一次，也可以手动触发：
+
+1. 新建一个 Cloudflare Token（只给 `Zone.DNS:Edit`，按域名查 zone 再加 `Zone:Read`）
+2. 仓库 **Settings → Secrets and variables → Actions**：
+   - Secret：`CF_API_TOKEN`
+   - Variable：`CF_ZONE_ID`（域名 Overview 右下角）
+3. Actions → **Sync edge DNS** → Run workflow
+
+GitHub runner 在海外，`--region-mode` **不做本地延迟排名**，只按「香港优先，然后新加坡」+ 健康检查选最多 10 个。要按中国网络真实测速优选，还是在本地跑 `npm run dns:apply`。
+
 ## 代码保护
 
 前端代码最终一定会下发到浏览器，混淆只能提高复制成本，不能真正保密。本项目生产构建启用了较重的保护：
