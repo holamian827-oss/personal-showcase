@@ -92,9 +92,11 @@ src/
 .github/workflows/deploy.yml
 ```
 
-## 自动同步边缘 IP
+## 边缘 IP 自动同步（可选）
 
-裸域 `173682.xyz` 用 A 记录直连 CloudFront，绕过 Cloudflare 的 apex CNAME flattening（否则部分解析器会拿到新加坡/美国边缘）。
+当前生产配置是 **裸域 CNAME → CloudFront**，由 Cloudflare 的 apex flattening 解析；不同解析器可能拿到香港/新加坡/美国边缘。下面的 A 记录脚本和 workflow 是可选的香港直连方案，**当前 workflow 已禁用**，需要时再启用。
+
+裸域如果要绕过 flattening，可以用 A 记录直连香港边缘；但静态 A 记录只能固定一个区域，不能按运营商分流。
 
 ```bash
 npm run dns:sync     # 只发现 + 测速，不改 DNS
